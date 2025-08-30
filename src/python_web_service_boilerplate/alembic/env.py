@@ -3,11 +3,22 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+# https://stackoverflow.com/questions/32032940/how-to-import-the-own-model-into-myproject-alembic-env-py/37378764#comment111518704_32218546
+import sys
+from os.path import abspath, dirname
+sys.path.insert(0, dirname(dirname(dirname(abspath(__file__))))) # Insert <.>/src
+
+from python_web_service_boilerplate.configuration.application_configuration import application_conf
+
 from python_web_service_boilerplate.configuration.database_configuration import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+config.set_main_option("sqlalchemy.url", (
+    f"postgresql+psycopg://{application_conf.get_string('database.username')}:{application_conf.get_string('database.password')}"
+    f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
+))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

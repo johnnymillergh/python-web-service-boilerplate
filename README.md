@@ -116,6 +116,12 @@ Here are the highlights of **python_web_service_boilerplate**:
    $ poetry run pre-commit install -t pre-push
    ```
 
+5. Start up the application
+
+   ```shell
+   $ fastapi dev src/python_web_service_boilerplate/__main__.py
+   ```
+
 ## Useful Commands
 
 ### Run Python Module

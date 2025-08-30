@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: postgres
+    image: postgres:17.6-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=boilerplate_db
+  app:
+    container_name: python-web-service-boilerplate
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: bash -c "alembic upgrade head && fastapi run src/python_web_service_boilerplate/__main__.py --port 80"
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    restart: always
+    environment:
+      - LOG_LEVEL=INFO
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=boilerplate_db
+      - SQL_LOG_ENABLED=false

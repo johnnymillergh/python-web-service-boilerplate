@@ -1,9 +1,8 @@
-import platform
 from datetime import datetime
 from http import HTTPStatus
 
 import arrow
-from fastapi.security import HTTPBasicCredentials, OAuth2PasswordBearer
+from fastapi.security import HTTPBasicCredentials
 from jose import jwt
 from loguru import logger
 from passlib.handlers.pbkdf2 import pbkdf2_sha256
@@ -17,10 +16,8 @@ from python_web_service_boilerplate.system.auth.schemas import AuthTokenResponse
 from python_web_service_boilerplate.system.common_models import Deleted
 
 # Secret key for JWT
-SECRET_KEY = f"SECRET_KEY:{get_module_name()}_on_{platform.node()}"
+SECRET_KEY = f"SECRET_KEY:{get_module_name()}"
 ALGORITHM = "HS256"
-# Define OAuth2 scheme
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/token")
 
 
 def verify_token(token: str) -> str:

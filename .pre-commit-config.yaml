@@ -40,7 +40,7 @@ repos:
         types: [ python ]
         exclude: |
           (?x)^(
-              ^alembic/.*|
+              ^.*/alembic/.*|
               alembic.ini
           )$
         args:
@@ -54,7 +54,7 @@ repos:
         types: [ python ]
         exclude: |
           (?x)^(
-              ^alembic/.*|
+              ^.*/alembic/.*|
               alembic.ini
           )$
       - id: mypy

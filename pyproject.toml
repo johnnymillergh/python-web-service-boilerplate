@@ -16,12 +16,12 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 python = ">=3.13.1,<3.14"
 # Web Framework
-fastapi = "==0.116.1"
+fastapi = {extras = ["standard"], version = "==0.116.1"}
 uvicorn = "==0.35.0"
 # ORM
 sqlalchemy = {extras = ["asyncio"], version = "==2.0.43"}
 alembic = "==1.16.5"
-psycopg2 = "==2.9.10"
+psycopg = {extras = ["binary", "pool"], version = "==3.2.9"}
 asyncpg = "==0.30.0"
 orjson = "==3.11.2"
 # Security
@@ -142,7 +142,7 @@ line-length = 120
 show-fixes = true
 target-version = "py39"
 src = ["src", "tests"]
-exclude = ["alembic"]
+exclude = ["**/alembic/**"]
 respect-gitignore = true
 
 

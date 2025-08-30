@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 Base = declarative_base()
 
 DATABASE_URL = (
-    f"postgresql+psycopg2://{application_conf.get_string('database.username')}:{application_conf.get_string('database.password')}"
+    f"postgresql+psycopg://{application_conf.get_string('database.username')}:{application_conf.get_string('database.password')}"
     f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
 )
 ASYNC_DATABASE_URL = (
