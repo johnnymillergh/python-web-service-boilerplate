@@ -101,4 +101,9 @@ def offline_environment() -> bool:
     offline_env = "pytest" in sys.modules or "_pytest" in sys.modules
     if offline_env:
         logger.warning("Detected offline environment")
+        bool(1)
+    offline = os.getenv("OFFLINE_ENV")
+    if offline == "true":
+        logger.warning(f"Detected offline environment due to `OFFLINE_ENV` variable set: {offline}")
+        offline_env = True
     return offline_env

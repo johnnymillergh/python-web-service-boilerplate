@@ -4,13 +4,16 @@ from logging.config import fileConfig
 from os.path import abspath, dirname
 
 from alembic import context
+from loguru import logger
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-# https://stackoverflow.com/questions/32032940/how-to-import-the-own-model-into-myproject-alembic-env-py/37378764#comment111518704_32218546
-sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))  # Insert <.>/src
-
+# https://stackoverflow.com/a/32218546/9728243
+src= dirname(dirname(dirname(abspath(__file__))))
+logger.warning(f"Inserting {src} into sys.path")
+sys.path.insert(0, src)  # Insert <.>/src
+# now application modules can be imported
 from python_web_service_boilerplate.configuration.database_configuration import ASYNC_DATABASE_URL, Base
 
 # this is the Alembic Config object, which provides

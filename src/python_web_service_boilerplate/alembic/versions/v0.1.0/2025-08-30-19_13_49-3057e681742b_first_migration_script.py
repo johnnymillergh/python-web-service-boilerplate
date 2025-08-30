@@ -21,7 +21,8 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    op.execute("SELECT NOW();")
+    # ! WARNING: The SQL needs to be compatible with all supported databases: PostgreSQL and SQLite.
+    op.execute("select current_timestamp;")
 
 
 def downgrade() -> None:

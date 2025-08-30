@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
-from python_web_service_boilerplate.common.common_function import get_data_dir, offline_environment
+from python_web_service_boilerplate.common.common_function import get_data_dir, get_module_name, offline_environment
 from python_web_service_boilerplate.configuration.application_configuration import application_conf
 
 if TYPE_CHECKING:
@@ -28,7 +28,7 @@ DATABASE_URL = (
         f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
     )
     if not offline_environment()
-    else f"sqlite:///{get_data_dir()}/test_db.db"
+    else f"sqlite:///{get_data_dir()}/{get_module_name()}.db"
 )
 ASYNC_DATABASE_URL = (
     (
@@ -36,7 +36,7 @@ ASYNC_DATABASE_URL = (
         f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
     )
     if not offline_environment()
-    else f"sqlite+aiosqlite:///{get_data_dir()}/test_db.db"
+    else f"sqlite+aiosqlite:///{get_data_dir()}/{get_module_name()}.db"
 )
 
 
@@ -89,7 +89,8 @@ async_db_context = asynccontextmanager(get_async_db)
 async def configure() -> None:
     try:
         with db_context() as session:
-            result = session.execute(text("SELECT 1"))
+            result = session.execute(text("SELECT 1;"))
+            logger.warning("Creating all tables if not exist...")
             Base.metadata.create_all(sync_engine)
         logger.warning(f"Sync connection initialized successfully, name: {sync_engine.name}, result: {result.all()}")
     except Exception as e:
@@ -98,7 +99,7 @@ async def configure() -> None:
     try:
         # Test async connection
         async with async_db_context() as session:
-            result = await session.execute(text("SELECT 1"))
+            result = await session.execute(text("SELECT 1;"))
         logger.warning(
             f"Async connection initialized successfully, name: {__async_engine.name}, result: {result.all()}"
         )
