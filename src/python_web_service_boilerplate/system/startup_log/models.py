@@ -4,10 +4,11 @@ import os
 import platform
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Column, DateTime, Index, String, Text
+from sqlalchemy import BigInteger, Column, DateTime, Enum, Index, String, Text
 
 from python_web_service_boilerplate.common.common_function import get_login_user
 from python_web_service_boilerplate.configuration.database_configuration import Base
+from python_web_service_boilerplate.system.common_models import Deleted
 
 
 class StartupLog(Base):
@@ -23,11 +24,8 @@ class StartupLog(Base):
 
     __tablename__ = "startup_log"
 
-    id = Column(BigInteger, primary_key=True, index=True)
-
-    # System information fields
+    id = Column(BigInteger, primary_key=True, index=True, comment="The primary key")
     current_user = Column(String(64), nullable=False, index=True, comment="Current system user", default=get_login_user)
-
     hostname = Column(
         String(64),
         nullable=False,
@@ -35,22 +33,21 @@ class StartupLog(Base):
         comment="The hostname where the application is running",
         default=platform.node,
     )
-
     command_line = Column(Text, nullable=False, comment="The command line used to start the application")
-
     current_working_directory = Column(
         Text, nullable=False, default=os.getcwd, comment="The current working directory of the application"
     )
-
     startup_time = Column(DateTime, nullable=False, default=datetime.now, comment="When the application started")
-
     shutdown_time = Column(DateTime, nullable=True, comment="When the application shut down")
 
     # Common audit fields
-    created_by = Column(String(50), nullable=False, default=get_login_user)
-    created_at = Column(DateTime, nullable=False, default=datetime.now)
-    updated_by = Column(String(50), nullable=True, default=get_login_user)
-    updated_at = Column(DateTime, nullable=True, default=datetime.now, onupdate=datetime.now)
+    created_by = Column(String(64), nullable=False, default=get_login_user, comment="Created by")
+    created_at = Column(DateTime, nullable=False, default=datetime.now, comment="Creation timestamp")
+    updated_by = Column(String(64), nullable=True, default=get_login_user, comment="Last updated by")
+    updated_at = Column(
+        DateTime, nullable=True, default=datetime.now, onupdate=datetime.now, comment="Last update timestamp"
+    )
+    deleted = Column(Enum(Deleted), nullable=False, default=Deleted.N, comment="Deletion flag")
 
     # Add indexes for common queries
     __table_args__ = (
@@ -61,10 +58,3 @@ class StartupLog(Base):
     def __str__(self) -> str:
         """String representation of the StartupLog instance."""
         return f"StartupLog({self.current_user} by {self.command_line} at {self.startup_time})"
-
-    @property
-    def execution_duration_ms(self) -> float | None:
-        """Calculate execution duration in milliseconds."""
-        if self.shutdown_time and self.startup_time:
-            return (self.shutdown_time - self.startup_time).total_seconds() * 1000
-        return None

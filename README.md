@@ -162,39 +162,6 @@ $ $env:PYTHONPATH=$PWD.Path; poetry run python .\python_web_service_boilerplate\
 $ $env:PYTHONPATH=$PWD.Path; poetry run python .\python_web_service_boilerplate\__main__.py
 ```
 
-### Package with [PyInstaller](https://pyinstaller.org/en/latest/usage.html?highlight=pythonpath#using-pyinstaller)
-
-> **⚠️ WANRING**
->
-> Need to call `freeze_support()` immediately when startup in `python_web_service_boilerplate/__init__.py`
->
-> ```python
-> from multiprocessing import freeze_support
->
-> freeze_support()
-> ```
->
-> - [Pyinstaller multiprocessing name of process is always "MainProcess" #3957](https://github.com/pyinstaller/pyinstaller/issues/3957#issuecomment-674579877)
-> - [pyinstaller linux binary is getting restarted again and again #4190](https://github.com/pyinstaller/pyinstaller/issues/4190)
-
-Build artifact with macOS or Linux,
-```shell
-$ poetry run pyinstaller --console \
---add-data "pyproject.toml:." \
---add-data "src/python_web_service_boilerplate/resources/*:python_web_service_boilerplate/resources" \
---name pandas_usage \
---clean --noconfirm src/python_web_service_boilerplate/demo/pandas_usage.py
-```
-
-On Windows,
-```powershell
-$ poetry run pyinstaller --console `
---add-data "pyproject.toml;." `
---add-data "src/python_web_service_boilerplate/resources/*;python_web_service_boilerplate/resources" `
---name multithread_and_thread_pool_usage `
---clean --noconfirm src/python_web_service_boilerplate/demo/multithread_and_thread_pool_usage.py
-```
-
 ### Run Unit Tests
 
 Run with pytest, analyze code coverage, generate HTML code coverage reports, fail the test if coverage percentage is under 90%,

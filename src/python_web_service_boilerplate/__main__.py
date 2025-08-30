@@ -8,8 +8,10 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import timedelta
 from pathlib import Path
+from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from loguru import logger
 
 from python_web_service_boilerplate.common.common_function import get_module_name
@@ -40,8 +42,12 @@ from python_web_service_boilerplate.configuration.thread_pool_configuration impo
 from python_web_service_boilerplate.configuration.thread_pool_configuration import (
     configure as configure_thread_pool,
 )
-from python_web_service_boilerplate.startup_log.models import StartupLog
-from python_web_service_boilerplate.startup_log.repository import (
+from python_web_service_boilerplate.system.auth.middleware import AuthMiddleware
+from python_web_service_boilerplate.system.auth.schemas import AuthTokenResponse, UserRegistration
+from python_web_service_boilerplate.system.auth.service import create_user
+from python_web_service_boilerplate.system.auth.service import login as auth_login
+from python_web_service_boilerplate.system.startup_log.models import StartupLog
+from python_web_service_boilerplate.system.startup_log.repository import (
     retain_startup_log,
     save_startup_log,
     update_shutdown_time,
@@ -112,10 +118,22 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 app = FastAPI(lifespan=lifespan)
 # Add trace ID middleware to automatically handle request tracing
+app.add_middleware(AuthMiddleware)
 app.add_middleware(TraceIDMiddleware)
+security = HTTPBasic()
 
 
-@app.get("/")
+@app.post("/api/v1/token")
+async def login(credentials: Annotated[HTTPBasicCredentials, Depends(security)]) -> AuthTokenResponse:
+    return await auth_login(credentials)
+
+
+@app.post("/api/v1/users")
+async def register_user(user: UserRegistration) -> UserRegistration:
+    return await create_user(user)
+
+
+@app.get("/hello")
 async def root() -> dict[str, str]:
     return {"message": f"Hello World from {get_module_name()}"}
 

@@ -11,7 +11,7 @@ from python_web_service_boilerplate.common.common_function import get_module_nam
 from python_web_service_boilerplate.configuration.database_configuration import (
     async_db_context,
 )
-from python_web_service_boilerplate.startup_log.models import StartupLog
+from python_web_service_boilerplate.system.startup_log.models import StartupLog
 
 
 async def save_startup_log(startup_log: StartupLog) -> StartupLog:

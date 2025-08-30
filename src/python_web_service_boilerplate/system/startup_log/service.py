@@ -3,8 +3,8 @@ from collections.abc import AsyncGenerator
 
 import orjson
 
-from python_web_service_boilerplate.startup_log.repository import stream_all_startup_logs
-from python_web_service_boilerplate.startup_log.schemas import StartupLogSchema
+from python_web_service_boilerplate.system.startup_log.repository import stream_all_startup_logs
+from python_web_service_boilerplate.system.startup_log.schemas import StartupLogSchema
 
 
 async def log_streamer() -> AsyncGenerator[str, None]:
