@@ -1,17 +1,22 @@
 from collections.abc import Generator
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pytest
 from loguru import logger
 from pyinstrument.profiler import Profiler
+from starlette.testclient import TestClient
 
-from python_web_service_boilerplate.common.common_function import get_module_name
+from python_web_service_boilerplate.__main__ import app
+from python_web_service_boilerplate.common.common_function import PROJECT_ROOT_PATH, get_module_name
 
 if TYPE_CHECKING:
     from _pytest.nodes import Node
 
-PROJECT__ROOT = Path(__file__).parent.parent
+
+@pytest.fixture
+def test_client() -> Generator[TestClient, None, None]:
+    with TestClient(app) as test_client:
+        yield test_client
 
 
 def pytest_html_report_title(report: Any) -> None:
@@ -30,7 +35,7 @@ def auto_profile(request: Any) -> Generator[Any, Any, None]:
 
     https://pyinstrument.readthedocs.io/en/latest/guide.html#profile-pytest-tests
     """
-    profile_root = PROJECT__ROOT / "build/.profiles"
+    profile_root = PROJECT_ROOT_PATH / "build/.profiles"
     logger.info("Starting to profile Pytest unit tests...")
     # Turn profiling on
     profiler = Profiler()
@@ -40,7 +45,7 @@ def auto_profile(request: Any) -> Generator[Any, Any, None]:
 
     profiler.stop()
     node: Node = request.node
-    profile_html_path = profile_root / f"{node.path.parent.relative_to(PROJECT__ROOT)}"
+    profile_html_path = profile_root / f"{node.path.parent.relative_to(PROJECT_ROOT_PATH)}"
     if not profile_html_path.exists():
         # If parents=False (the default), a missing parent raises FileNotFoundError.
         # If exist_ok=False (the default), FileExistsError is raised if the target directory already exists.

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import getpass
 import os
+import sys
 from datetime import date, datetime
 from math import ceil
 from pathlib import Path
@@ -93,3 +94,11 @@ def chunk_into_n(a_list: list[Any], n: int) -> list[list[Any]]:
     """
     size = ceil(len(a_list) / n)
     return [a_list[x * size : x * size + size] for x in list(range(n))]
+
+
+def offline_environment() -> bool:
+    """Check if the current environment is offline."""
+    offline_env = "pytest" in sys.modules or "_pytest" in sys.modules
+    if offline_env:
+        logger.warning("Detected offline environment")
+    return offline_env

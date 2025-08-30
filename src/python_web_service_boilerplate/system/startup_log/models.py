@@ -4,9 +4,9 @@ import os
 import platform
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Column, DateTime, Enum, Index, String, Text
+from sqlalchemy import BigInteger, Column, DateTime, Enum, Index, Integer, String, Text
 
-from python_web_service_boilerplate.common.common_function import get_login_user
+from python_web_service_boilerplate.common.common_function import get_login_user, offline_environment
 from python_web_service_boilerplate.configuration.database_configuration import Base
 from python_web_service_boilerplate.system.common_models import Deleted
 
@@ -24,7 +24,11 @@ class StartupLog(Base):
 
     __tablename__ = "startup_log"
 
-    id = Column(BigInteger, primary_key=True, index=True, comment="The primary key")
+    id = (
+        Column(BigInteger, primary_key=True, index=True, comment="The primary key")
+        if not offline_environment()
+        else Column(Integer, primary_key=True, index=True, comment="The primary key")
+    )
     current_user = Column(String(64), nullable=False, index=True, comment="Current system user", default=get_login_user)
     hostname = Column(
         String(64),

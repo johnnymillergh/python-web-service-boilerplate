@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Column, DateTime, Enum, String
+from sqlalchemy import BigInteger, Column, DateTime, Enum, Integer, String
 
-from python_web_service_boilerplate.common.common_function import get_login_user
+from python_web_service_boilerplate.common.common_function import get_login_user, offline_environment
 from python_web_service_boilerplate.configuration.database_configuration import Base
 from python_web_service_boilerplate.system.common_models import Deleted
 
@@ -10,7 +10,11 @@ from python_web_service_boilerplate.system.common_models import Deleted
 class User(Base):
     __tablename__ = "user"
 
-    id = Column(BigInteger, primary_key=True, index=True, comment="The primary key")
+    id = (
+        Column(BigInteger, primary_key=True, index=True, comment="The primary key")
+        if not offline_environment()
+        else Column(Integer, primary_key=True, index=True, comment="The primary key")
+    )
     username = Column(String(64), nullable=False, index=True, unique=True, comment="The username")
     password = Column(String(512), nullable=False, comment="The password")
     email = Column(String(256), nullable=False, index=True, comment="The email address")

@@ -8,10 +8,8 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import timedelta
 from pathlib import Path
-from typing import Annotated
 
-from fastapi import Depends, FastAPI
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi import FastAPI
 from loguru import logger
 
 from python_web_service_boilerplate.common.common_function import get_module_name
@@ -43,9 +41,6 @@ from python_web_service_boilerplate.configuration.thread_pool_configuration impo
     configure as configure_thread_pool,
 )
 from python_web_service_boilerplate.system.auth.middleware import AuthMiddleware
-from python_web_service_boilerplate.system.auth.schemas import AuthTokenResponse, UserRegistration
-from python_web_service_boilerplate.system.auth.service import create_user
-from python_web_service_boilerplate.system.auth.service import login as auth_login
 from python_web_service_boilerplate.system.startup_log.models import StartupLog
 from python_web_service_boilerplate.system.startup_log.repository import (
     retain_startup_log,
@@ -78,7 +73,7 @@ async def startup(app: FastAPI) -> None:
     startup_log = StartupLog(command_line=" ".join(sys.argv))
     saved_startup_log = await save_startup_log(startup_log)
     global __startup_log_id
-    __startup_log_id = saved_startup_log.id
+    __startup_log_id = int(saved_startup_log.id)
 
     elapsed = time.perf_counter() - __start_time
     logger.info(
@@ -107,12 +102,10 @@ async def shutdown() -> None:
 # noinspection PyUnusedLocal,PyShadowingNames
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    logger.info("Starting up application...")
     try:
         await startup(app)
         yield  # Application runs here
     finally:
-        logger.info("Shutting down application...")
         await shutdown()
 
 
@@ -120,17 +113,6 @@ app = FastAPI(lifespan=lifespan)
 # Add trace ID middleware to automatically handle request tracing
 app.add_middleware(AuthMiddleware)
 app.add_middleware(TraceIDMiddleware)
-security = HTTPBasic()
-
-
-@app.post("/api/v1/token")
-async def login(credentials: Annotated[HTTPBasicCredentials, Depends(security)]) -> AuthTokenResponse:
-    return await auth_login(credentials)
-
-
-@app.post("/api/v1/users")
-async def register_user(user: UserRegistration) -> UserRegistration:
-    return await create_user(user)
 
 
 @app.get("/hello")

@@ -14,21 +14,29 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
+from python_web_service_boilerplate.common.common_function import get_data_dir, offline_environment
 from python_web_service_boilerplate.configuration.application_configuration import application_conf
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Engine
 
-
 Base = declarative_base()
 
 DATABASE_URL = (
-    f"postgresql+psycopg://{application_conf.get_string('database.username')}:{application_conf.get_string('database.password')}"
-    f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
+    (
+        f"postgresql+psycopg://{application_conf.get_string('database.username')}:{application_conf.get_string('database.password')}"
+        f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
+    )
+    if not offline_environment()
+    else f"sqlite:///{get_data_dir()}/test_db.db"
 )
 ASYNC_DATABASE_URL = (
-    f"postgresql+asyncpg://{application_conf.get_string('database.username')}:{application_conf.get_string('database.password')}"
-    f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
+    (
+        f"postgresql+asyncpg://{application_conf.get_string('database.username')}:{application_conf.get_string('database.password')}"
+        f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
+    )
+    if not offline_environment()
+    else f"sqlite+aiosqlite:///{get_data_dir()}/test_db.db"
 )
 
 
@@ -64,24 +72,13 @@ _AsyncSessionLocal = async_sessionmaker(bind=__async_engine, autocommit=False, a
 
 
 def get_db() -> Generator[Session, None, None]:
-    """
-    Synchronous database session generator for backward compatibility.
-    For FastAPI to automatically manage the session lifecycle.
-    """
-    db = _SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    with _SessionLocal() as session:
+        yield session
 
 
 async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
-    """Asynchronous database session generator, for FastAPI to automatically manage the session lifecycle."""
     async with _AsyncSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+        yield session
 
 
 # Sync and Async context managers for manual session management
