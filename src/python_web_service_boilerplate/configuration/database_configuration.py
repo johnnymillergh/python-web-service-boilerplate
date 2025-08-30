@@ -53,7 +53,9 @@ sync_engine: Engine = create_engine(
     DATABASE_URL,
     json_serializer=orjson_serializer,
     json_deserializer=orjson.loads,
-    connect_args={},
+    pool_use_lifo=True,
+    pool_pre_ping=True,
+    pool_recycle=3600,
     echo=application_conf.get_bool("database.sql_log_enabled"),
 )
 
@@ -64,7 +66,9 @@ __async_engine = create_async_engine(
     ASYNC_DATABASE_URL,
     json_serializer=orjson_serializer,
     json_deserializer=orjson.loads,
-    connect_args={},
+    pool_use_lifo=True,
+    pool_pre_ping=True,
+    pool_recycle=3600,
     echo=application_conf.get_bool("database.sql_log_enabled"),
 )
 
@@ -87,6 +91,18 @@ async_db_context = asynccontextmanager(get_async_db)
 
 
 async def configure() -> None:
+    """
+    Initialize the database connection and create all tables if not exist.
+    >>> from sqlalchemy.engine.create import create_engine
+    >>> create_engine()
+    >>> from sqlalchemy.pool.impl import QueuePool
+    >>> # QueuePool is the default sync pool implementation
+    >>> QueuePool.__init__()
+    >>> from sqlalchemy.pool.impl import AsyncAdaptedQueuePool
+    >>> # AsyncAdaptedQueuePool is the default async pool implementation
+    >>> AsyncAdaptedQueuePool.__init__()
+    Default the database connection configuration above.
+    """
     try:
         with db_context() as session:
             result = session.execute(text("SELECT 1;"))
