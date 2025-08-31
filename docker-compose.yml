@@ -11,6 +11,14 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=boilerplate_db
+    volumes:
+      - ~/docker-file-mapping/postgresql:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
   app:
     container_name: python-web-service-boilerplate
     build:
@@ -20,7 +28,8 @@ services:
     ports:
       - "8001:80"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: always
     volumes:
       - ~/docker-file-mapping/python-web-service-boilerplate:/app/data
