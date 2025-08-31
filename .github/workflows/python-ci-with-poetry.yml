@@ -56,7 +56,19 @@ jobs:
           env OFFLINE_ENV=true LOG_LEVEL=INFO poetry run fastapi run src/python_web_service_boilerplate/__main__.py --port 8000 &
           FASTAPI_PID=$!
           echo $FASTAPI_PID > fastapi.pid
-          sleep 10
+          # Wait for FastAPI to be ready (max 30 seconds)
+          echo "Waiting for FastAPI to start..."
+          for i in {1..60}; do
+            if curl -s -f http://localhost:8000/ > /dev/null 2>&1; then
+              echo "FastAPI is ready after $i seconds"
+              break
+            fi
+            if [ $i -eq 60 ]; then
+              echo "FastAPI failed to start within 60 seconds"
+              exit 1
+            fi
+            sleep 1
+          done
           USERNAME="stephon.treutelae_$(date +%Y%m%d%H%M%S)"
           curl -i -f -L -X POST 'http://localhost:8000/api/v1/users' \
             -H 'Content-Type: application/json' \
