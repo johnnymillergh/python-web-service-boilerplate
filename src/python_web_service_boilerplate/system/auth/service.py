@@ -9,6 +9,7 @@ from passlib.handlers.pbkdf2 import pbkdf2_sha256
 from starlette.exceptions import HTTPException
 
 from python_web_service_boilerplate.common.common_function import get_module_name
+from python_web_service_boilerplate.common.profiling import async_elapsed_time, elapsed_time
 from python_web_service_boilerplate.configuration.application_configuration import pyproject_toml
 from python_web_service_boilerplate.system.auth.models import User
 from python_web_service_boilerplate.system.auth.repository import get_user_by_username, save_user
@@ -19,6 +20,7 @@ SECRET_KEY = f"SECRET_KEY::{get_module_name()}::{pyproject_toml['tool']['poetry'
 ALGORITHM = "HS256"
 
 
+@elapsed_time("WARNING")
 def verify_token(token: str) -> str:
     try:
         jwt_payload = JWTPayload.model_validate(jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]))
@@ -34,6 +36,7 @@ def verify_token(token: str) -> str:
 __TYPE = "Bearer"
 
 
+@async_elapsed_time("WARNING")
 async def login(credentials: HTTPBasicCredentials) -> AuthTokenResponse:
     result = await get_user_by_username(credentials.username)
     user: User | None = result.scalar()
@@ -48,6 +51,7 @@ async def login(credentials: HTTPBasicCredentials) -> AuthTokenResponse:
     return AuthTokenResponse(access_token=token, token_type=__TYPE, expires_in=86400)  # 24 hours
 
 
+@async_elapsed_time("WARNING")
 async def create_user(user_registration: UserRegistration) -> UserRegistration:
     existing_user = await get_user_by_username(user_registration.username)
     if existing_user.one_or_none():

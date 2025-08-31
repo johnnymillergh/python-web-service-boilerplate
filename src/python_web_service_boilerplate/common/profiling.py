@@ -33,6 +33,7 @@ def elapsed_time(level: str = "INFO") -> Callable[..., Callable[..., R]]:
     """
 
     def decorator(func: Callable[..., R]) -> Callable[..., R]:
+        # noinspection PyUnresolvedReferences
         @functools.wraps(func)
         def wrapper(*arg: Any, **kwarg: Any) -> Any:
             start_time = time.perf_counter()
@@ -43,13 +44,13 @@ def elapsed_time(level: str = "INFO") -> Callable[..., Callable[..., R]]:
                 elapsed = time.perf_counter() - start_time
                 logger.log(
                     level,
-                    f"{func.__qualname__}() -> elapsed time: {timedelta(seconds=elapsed)}",
+                    f"{func.__module__}.{func.__qualname__}() -> elapsed time: {timedelta(seconds=elapsed)}",
                 )
                 raise e
             elapsed = time.perf_counter() - start_time
             logger.log(
                 level,
-                f"{func.__qualname__}() -> elapsed time: {timedelta(seconds=elapsed)}",
+                f"{func.__module__}.{func.__qualname__}() -> elapsed time: {timedelta(seconds=elapsed)}",
             )
             return return_value
 
@@ -82,6 +83,7 @@ def async_elapsed_time(
     """
 
     def decorator(func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[..., Coroutine[Any, Any, R]]:
+        # noinspection PyUnresolvedReferences
         @functools.wraps(func)
         async def wrapper(*arg: Any, **kwarg: Any) -> Any:
             start_time = time.perf_counter()
@@ -91,13 +93,13 @@ def async_elapsed_time(
                 elapsed = time.perf_counter() - start_time
                 logger.log(
                     level,
-                    f"{func.__qualname__}() -> elapsed time: {timedelta(seconds=elapsed)}",
+                    f"{func.__module__}.{func.__qualname__}() -> elapsed time: {timedelta(seconds=elapsed)}",
                 )
                 raise e
             elapsed = time.perf_counter() - start_time
             logger.log(
                 level,
-                f"{func.__qualname__}() -> elapsed time: {timedelta(seconds=elapsed)}",
+                f"{func.__module__}.{func.__qualname__}() -> elapsed time: {timedelta(seconds=elapsed)}",
             )
             return return_value
 
