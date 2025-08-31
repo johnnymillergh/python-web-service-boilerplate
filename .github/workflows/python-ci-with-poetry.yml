@@ -59,12 +59,12 @@ jobs:
           USERNAME="stephon.treutelae_$(date +%Y%m%d%H%M%S)"
           curl -i -f -L -X POST 'http://localhost:8000/api/v1/users' \
             -H 'Content-Type: application/json' \
-            --data-raw '{
-              "username": "$USERNAME",
-              "password": "123456",
-              "email": "Bethel43@hotmail.com",
-              "full_name": "Stephon Treutel"
-            }' || (echo "FastAPI did not start" && exit 1)
+            --data-raw "{
+              \"username\": \"$USERNAME\",
+              \"password\": \"123456\",
+              \"email\": \"Bethel43@hotmail.com\",
+              \"full_name\": \"Stephon Treutel\"
+            }" -o response.txt && cat response.txt || (echo "FastAPI did not start" && exit 1)
           kill $FASTAPI_PID
   check-versions:
     runs-on: ubuntu-latest
