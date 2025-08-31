@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from collections.abc import AsyncGenerator, Generator
 from contextlib import asynccontextmanager, contextmanager
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import orjson
 from loguru import logger
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -16,9 +17,6 @@ from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from python_web_service_boilerplate.common.common_function import get_data_dir, get_module_name, offline_environment
 from python_web_service_boilerplate.configuration.application_configuration import application_conf
-
-if TYPE_CHECKING:
-    from sqlalchemy.engine import Engine
 
 Base = declarative_base()
 

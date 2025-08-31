@@ -1,8 +1,9 @@
 from collections.abc import Generator
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pytest
 import pytest_asyncio
+from _pytest.nodes import Node
 from fastapi_cloud_cli.commands.login import TokenResponse
 from loguru import logger
 from pyinstrument.profiler import Profiler
@@ -12,9 +13,6 @@ from python_web_service_boilerplate.__main__ import app
 from python_web_service_boilerplate.common.common_function import PROJECT_ROOT_PATH, get_module_name
 from python_web_service_boilerplate.system.auth.schemas import UserRegistration
 from python_web_service_boilerplate.system.auth.service import create_user
-
-if TYPE_CHECKING:
-    from _pytest.nodes import Node
 
 
 @pytest.hookimpl(optionalhook=True)

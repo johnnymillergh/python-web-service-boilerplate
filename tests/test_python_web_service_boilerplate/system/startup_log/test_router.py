@@ -9,5 +9,5 @@ def test_startup_logs_stream(test_client: TestClient, pytest_user_token: TokenRe
     response = test_client.get(
         "/api/v1/startup_logs/stream", headers={"Authorization": f"Bearer {pytest_user_token.access_token}"}
     )
-    logger.info(f"Hello response: {response}, {response.text}")
+    logger.info(f"Startup logs response: {response}, {response.text}")
     assert response.status_code == HTTPStatus.OK.value

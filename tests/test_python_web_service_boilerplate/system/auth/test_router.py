@@ -29,6 +29,14 @@ def test_user_registration(test_client: TestClient) -> None:
     assert set(response_json.keys()) == user_registration.model_dump().keys()
 
 
+def test_same_user_registration(test_client: TestClient) -> None:
+    response = test_client.post(url="/api/v1/users", json=user_registration.model_dump() if user_registration else {})
+    response_json = response.json()
+    logger.info(f"User registration response: {response}, {response_json}")
+    assert response.status_code == HTTPStatus.BAD_REQUEST.value
+    assert "Username already exists" in response.text
+
+
 def test_user_registration_and_get_token(test_client: TestClient) -> None:
     # Get token using HTTP Basic Auth
     token_response = test_client.post(

@@ -6,15 +6,13 @@ from fastapi.security import HTTPBasicCredentials
 from jose import jwt
 from loguru import logger
 from passlib.handlers.pbkdf2 import pbkdf2_sha256
-from sqlalchemy import select
 from starlette.exceptions import HTTPException
 
 from python_web_service_boilerplate.common.common_function import get_module_name
 from python_web_service_boilerplate.configuration.application_configuration import pyproject_toml
-from python_web_service_boilerplate.configuration.database_configuration import async_db_context
 from python_web_service_boilerplate.system.auth.models import User
+from python_web_service_boilerplate.system.auth.repository import get_user_by_username, save_user
 from python_web_service_boilerplate.system.auth.schemas import AuthTokenResponse, JWTPayload, UserRegistration
-from python_web_service_boilerplate.system.common_models import Deleted
 
 # Secret key for JWT
 SECRET_KEY = f"SECRET_KEY::{get_module_name()}::{pyproject_toml['tool']['poetry']['description']}"
@@ -37,10 +35,7 @@ __TYPE = "Bearer"
 
 
 async def login(credentials: HTTPBasicCredentials) -> AuthTokenResponse:
-    async with async_db_context() as db:
-        result = await db.execute(
-            select(User).where((User.username == credentials.username) & (User.deleted == Deleted.N))
-        )
+    result = await get_user_by_username(credentials.username)
     user: User | None = result.scalar()
     if not user:
         logger.warning(f"User not found by username: {credentials.username}")
@@ -54,21 +49,16 @@ async def login(credentials: HTTPBasicCredentials) -> AuthTokenResponse:
 
 
 async def create_user(user_registration: UserRegistration) -> UserRegistration:
-    async with async_db_context() as db:
-        existing_user = await db.execute(
-            select(User).where((User.username == user_registration.username) & (User.deleted == Deleted.N))
-        )
-        if existing_user.one_or_none():
-            logger.warning(f"Username already exists: {user_registration.username}")
-            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Username already exists")
-        new_user = User(
-            username=user_registration.username,
-            password=pbkdf2_sha256.hash(user_registration.password),
-            email=user_registration.email,
-            full_name=user_registration.full_name,
-        )
-        db.add(new_user)
-        await db.commit()
-        await db.refresh(new_user)
-        logger.info(f"Created new user: {new_user.username}")
-        return user_registration
+    existing_user = await get_user_by_username(user_registration.username)
+    if existing_user.one_or_none():
+        logger.warning(f"Username already exists: {user_registration.username}")
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Username already exists")
+    new_user = User(
+        username=user_registration.username,
+        password=pbkdf2_sha256.hash(user_registration.password),
+        email=user_registration.email,
+        full_name=user_registration.full_name,
+    )
+    await save_user(new_user)
+    logger.info(f"Created new user: {new_user.username}")
+    return user_registration
