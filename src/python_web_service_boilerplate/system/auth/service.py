@@ -10,13 +10,14 @@ from sqlalchemy import select
 from starlette.exceptions import HTTPException
 
 from python_web_service_boilerplate.common.common_function import get_module_name
+from python_web_service_boilerplate.configuration.application_configuration import pyproject_toml
 from python_web_service_boilerplate.configuration.database_configuration import async_db_context
 from python_web_service_boilerplate.system.auth.models import User
 from python_web_service_boilerplate.system.auth.schemas import AuthTokenResponse, JWTPayload, UserRegistration
 from python_web_service_boilerplate.system.common_models import Deleted
 
 # Secret key for JWT
-SECRET_KEY = f"SECRET_KEY:{get_module_name()}"
+SECRET_KEY = f"SECRET_KEY::{get_module_name()}::{pyproject_toml['tool']['poetry']['description']}"
 ALGORITHM = "HS256"
 
 
@@ -28,11 +29,8 @@ def verify_token(token: str) -> str:
         raise HTTPException(status_code=401, detail=f"Invalid token: {e}") from e
     logger.info(f"Verifying JWT: {jwt_payload}")
     if jwt_payload.expires_at < datetime.now():
-        raise HTTPException(status_code=401, detail="Token has expired")
-    username = jwt_payload.sub
-    if username is None:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return username
+        raise HTTPException(status_code=401, detail="Invalid token: expired")
+    return jwt_payload.sub
 
 
 __TYPE = "Bearer"
