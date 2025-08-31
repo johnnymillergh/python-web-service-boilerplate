@@ -29,7 +29,7 @@ on:
     - cron: '0 0 * * 2,4,6'
 
 jobs:
-  static-code-analysis:
+  code-quality-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -45,6 +45,26 @@ jobs:
         run: env LOG_LEVEL=INFO poetry run pytest --quiet --cov --cov-report term -n auto --benchmark-disable --dist=loadfile
       - name: Python Benchmark with pytest
         run: env LOG_LEVEL=ERROR poetry run pytest --capture=no --log-cli-level=ERROR -n 0 --benchmark-only
+  fastapi-smoke-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/project-environment-setup
+      - name: Start FastAPI app
+        run: |
+          poetry run alembic upgrade head && env OFFLINE_ENV=true poetry run fastapi run src/python_web_service_boilerplate/__main__.py --port 80 &
+          FASTAPI_PID=$!
+          sleep 10
+          USERNAME="stephon.treutelae_$(date +%Y%m%d%H%M%S)"
+          curl -f -L -X POST 'http://localhost:80/api/v1/users' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{
+              \"username\": \"$USERNAME\",
+              \"password\": \"123456\",
+              \"email\": \"Bethel43@hotmail.com\",
+              \"full_name\": \"Stephon Treutel\"
+            }' || (echo "FastAPI did not start" && exit 1)
+          kill $FASTAPI_PID
   check-versions:
     runs-on: ubuntu-latest
     steps:
