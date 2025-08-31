@@ -69,7 +69,7 @@ repos:
         language: system
         # https://github.com/pytest-dev/pytest/issues/5502#issuecomment-1020761655
         # Prevent Pytest logging error like: ValueError: I/O operation on closed file.
-        entry: env LOG_LEVEL=DEBUG poetry run pytest --cov --cov-report html --html=./build/.pytest_report/report.html --self-contained-html --log-cli-level=DEBUG -n auto --benchmark-disable
+        entry: env LOG_LEVEL=DEBUG poetry run pytest --cov --cov-report html --html=./build/.pytest_report/report.html --self-contained-html --log-cli-level=DEBUG -n auto --benchmark-disable --dist=loadfile
         types: [ python ]
         pass_filenames: false
       - id: pytest-cov
@@ -78,6 +78,6 @@ repos:
         language: system
         # https://github.com/pytest-dev/pytest/issues/5502#issuecomment-1020761655
         # Prevent Pytest logging error like: ValueError: I/O operation on closed file.
-        entry: env LOG_LEVEL=ERROR poetry run pytest --cov --cov-fail-under=0 --capture=no --log-cli-level=ERROR -n auto
+        entry: env LOG_LEVEL=ERROR poetry run pytest --cov --cov-fail-under=80 --capture=no --log-cli-level=ERROR -n auto --dist=loadfile
         types: [ python ]
         pass_filenames: false
