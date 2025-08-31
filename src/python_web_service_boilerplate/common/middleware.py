@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from contextvars import ContextVar
 from typing import Any
 
 from fastapi import Request, Response
@@ -5,6 +8,9 @@ from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from python_web_service_boilerplate.common.trace import clear_trace_id, generate_trace_id, set_trace_id
+
+# Create a context variable
+_http_request_context: ContextVar[Request | None] = ContextVar("http_request")
 
 
 class TraceIDMiddleware(BaseHTTPMiddleware):
@@ -29,6 +35,8 @@ class TraceIDMiddleware(BaseHTTPMiddleware):
         # Set trace ID in context
         set_trace_id(trace_id)
 
+        _http_request_context.set(request)
+
         # Log request start
         logger.info(f"Request started: {request.method} {request.url.path}")
 
@@ -48,6 +56,15 @@ class TraceIDMiddleware(BaseHTTPMiddleware):
         finally:
             # Clean up context
             clear_trace_id()
+            _http_request_context.set(None)
+
+
+def get_current_request() -> Request:
+    """Get the current HTTP request from context."""
+    http_request = _http_request_context.get()
+    if http_request:
+        return http_request
+    return Request(scope={})
 
 
 # Alternative function-based middleware for other frameworks

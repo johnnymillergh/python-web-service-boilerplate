@@ -22,7 +22,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         token = auth_header.split(" ")[1]
         try:
-            username = verify_token(token)
+            username: str = verify_token(token)
             # Attach user to request
             request.state.username = username
         except HTTPException as e:
