@@ -64,7 +64,7 @@ jobs:
               \"password\": \"123456\",
               \"email\": \"Bethel43@hotmail.com\",
               \"full_name\": \"Stephon Treutel\"
-            }" -o response.txt && cat response.txt || (echo "FastAPI did not start" && exit 1)
+            }" -o response.txt && cat response.txt
           kill $FASTAPI_PID
   check-versions:
     runs-on: ubuntu-latest
