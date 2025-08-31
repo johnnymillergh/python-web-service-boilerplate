@@ -59,7 +59,7 @@ jobs:
           # Wait for FastAPI to be ready (max 30 seconds)
           echo "Waiting for FastAPI to start..."
           for i in {1..60}; do
-            if curl -s -f http://localhost:8000/ > /dev/null 2>&1; then
+            if curl -s -f GET http://localhost:8000/health > /dev/null 2>&1; then
               echo "FastAPI is ready after $i seconds"
               break
             fi

@@ -120,6 +120,11 @@ async def root() -> dict[str, str]:
     return {"message": f"Hello World from {get_module_name()}"}
 
 
+@app.get("/health")
+async def health() -> dict[str, str]:
+    return {"status": "UP"}
+
+
 if __name__ == "__main__":
     # Use this for debugging purposes only
     import uvicorn
