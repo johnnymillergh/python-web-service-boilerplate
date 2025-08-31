@@ -18,11 +18,20 @@ services:
       dockerfile: ./Dockerfile
     command: bash -c "alembic upgrade head && fastapi run src/python_web_service_boilerplate/__main__.py --port 80"
     ports:
-      - "8000:80"
+      - "8001:80"
     depends_on:
       - db
     restart: always
+    volumes:
+      - ~/docker-file-mapping/python-web-service-boilerplate:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
     environment:
+      - OFFLINE_ENV=false
       - LOG_LEVEL=INFO
       - DB_HOST=postgres
       - DB_PORT=5432

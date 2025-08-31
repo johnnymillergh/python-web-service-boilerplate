@@ -57,11 +57,8 @@ RUN --mount=type=cache,target=/root/.cache \
 # Final image used for runtime
 ################################
 FROM python-base AS production
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    curl
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 COPY . /app/
 WORKDIR /app
-RUN pwd
-# Show the project module in the current directory. e.g.
-# total 4.0K
-# drwxr-xr-x 11 root root 4.0K Jan 1 12:59 python_boilerplate
-RUN ls -lh

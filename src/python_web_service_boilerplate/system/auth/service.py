@@ -16,14 +16,14 @@ from python_web_service_boilerplate.system.auth.repository import get_user_by_us
 from python_web_service_boilerplate.system.auth.schemas import AuthTokenResponse, JWTPayload, UserRegistration
 
 # Secret key for JWT
-SECRET_KEY = f"SECRET_KEY::{get_module_name()}::{pyproject_toml['tool']['poetry']['description']}"
-ALGORITHM = "HS256"
+_SECRET_KEY = f"SECRET_KEY::{get_module_name()}::{pyproject_toml['tool']['poetry']['description']}"
+_ALGORITHM = "HS256"
 
 
 @elapsed_time("WARNING")
 def verify_token(token: str) -> str:
     try:
-        jwt_payload = JWTPayload.model_validate(jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]))
+        jwt_payload = JWTPayload.model_validate(jwt.decode(token, _SECRET_KEY, algorithms=[_ALGORITHM]))
     except Exception as e:
         logger.error(f"Token verification failed: {e}", e)
         raise HTTPException(status_code=401, detail=f"Invalid token: {e}") from e
@@ -47,7 +47,7 @@ async def login(credentials: HTTPBasicCredentials) -> AuthTokenResponse:
         logger.warning(f"Password is invalid: {credentials.password}")
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Invalid username or password")
     jwt_payload = JWTPayload(sub=f"{user.username}", expires_at=arrow.now("local").shift(days=1).naive)
-    token = jwt.encode(claims=jwt_payload.dump(), key=SECRET_KEY, algorithm=ALGORITHM)
+    token = jwt.encode(claims=jwt_payload.dump(), key=_SECRET_KEY, algorithm=_ALGORITHM)
     return AuthTokenResponse(access_token=token, token_type=__TYPE, expires_in=86400)  # 24 hours
 
 
