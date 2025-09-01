@@ -49,7 +49,7 @@ from python_web_service_boilerplate.system.startup_log.repository import (
 )
 
 __start_time = time.perf_counter()
-__startup_log_id: int | None = None  # Track the startup log ID for shutdown updates
+__startup_log: StartupLog | None = None  # Track the startup log ID for shutdown updates
 
 
 # noinspection PyShadowingNames
@@ -70,10 +70,9 @@ async def startup(app: FastAPI) -> None:
     # Scanning routers
     include_routers(app, get_module_name())
 
-    startup_log = StartupLog(command_line=" ".join(sys.argv))
-    saved_startup_log = await save_startup_log(startup_log)
-    global __startup_log_id
-    __startup_log_id = saved_startup_log.id
+    saved_startup_log = await save_startup_log(StartupLog(command_line=" ".join(sys.argv)))
+    global __startup_log
+    __startup_log = saved_startup_log
 
     elapsed = time.perf_counter() - __start_time
     logger.info(
@@ -89,11 +88,7 @@ async def shutdown() -> None:
     thread_pool_cleanup()
     apscheduler_cleanup()
     # Update shutdown time in startup log if we have an ID
-    if __startup_log_id is not None:
-        try:
-            await update_shutdown_time(__startup_log_id)
-        except Exception as e:
-            logger.error(f"Failed to update shutdown time for startup log {__startup_log_id}: {e}")
+    await update_shutdown_time(__startup_log)
     await database_cleanup()
     end_elapsed = time.perf_counter() - __start_time
     logger.info(f"Stopped {get_module_name()}, running for {timedelta(seconds=end_elapsed)} in total")
