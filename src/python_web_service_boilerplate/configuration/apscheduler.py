@@ -6,7 +6,7 @@ from tzlocal import get_localzone
 
 from python_web_service_boilerplate.common.common_function import get_cpu_count
 from python_web_service_boilerplate.common.profiling import elapsed_time
-from python_web_service_boilerplate.configuration.database_configuration import sync_engine
+from python_web_service_boilerplate.configuration.database import sync_engine
 
 # https://apscheduler.readthedocs.io/en/3.x/userguide.html#configuring-the-scheduler
 # https://crontab.guru/

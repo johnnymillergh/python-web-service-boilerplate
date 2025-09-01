@@ -4,7 +4,7 @@ import pytest
 from loguru import logger
 from pytest_mock import MockerFixture
 
-from python_web_service_boilerplate.configuration.loguru_configuration import (
+from python_web_service_boilerplate.configuration.loguru import (
     configure,
     retain_log_files,
 )

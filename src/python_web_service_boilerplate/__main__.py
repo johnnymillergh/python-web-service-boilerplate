@@ -15,29 +15,29 @@ from loguru import logger
 from python_web_service_boilerplate.common.common_function import get_module_name
 from python_web_service_boilerplate.common.middleware import TraceIDMiddleware
 from python_web_service_boilerplate.common.router_loader import include_routers
-from python_web_service_boilerplate.configuration.application_configuration import (
+from python_web_service_boilerplate.configuration.application import (
     configure as configure_application,
 )
-from python_web_service_boilerplate.configuration.application_configuration import pyproject_toml
-from python_web_service_boilerplate.configuration.apscheduler_configuration import (
+from python_web_service_boilerplate.configuration.application import pyproject_toml
+from python_web_service_boilerplate.configuration.apscheduler import (
     cleanup as apscheduler_cleanup,
 )
-from python_web_service_boilerplate.configuration.apscheduler_configuration import (
+from python_web_service_boilerplate.configuration.apscheduler import (
     configure as configure_apscheduler,
 )
-from python_web_service_boilerplate.configuration.database_configuration import (
+from python_web_service_boilerplate.configuration.database import (
     cleanup as database_cleanup,
 )
-from python_web_service_boilerplate.configuration.database_configuration import (
+from python_web_service_boilerplate.configuration.database import (
     configure as configure_database,
 )
-from python_web_service_boilerplate.configuration.loguru_configuration import (
+from python_web_service_boilerplate.configuration.loguru import (
     configure as configure_loguru,
 )
-from python_web_service_boilerplate.configuration.thread_pool_configuration import (
+from python_web_service_boilerplate.configuration.thread_pool import (
     cleanup as thread_pool_cleanup,
 )
-from python_web_service_boilerplate.configuration.thread_pool_configuration import (
+from python_web_service_boilerplate.configuration.thread_pool import (
     configure as configure_thread_pool,
 )
 from python_web_service_boilerplate.system.auth.middleware import AuthMiddleware
@@ -73,7 +73,7 @@ async def startup(app: FastAPI) -> None:
     startup_log = StartupLog(command_line=" ".join(sys.argv))
     saved_startup_log = await save_startup_log(startup_log)
     global __startup_log_id
-    __startup_log_id = int(saved_startup_log.id)
+    __startup_log_id = saved_startup_log.id
 
     elapsed = time.perf_counter() - __start_time
     logger.info(

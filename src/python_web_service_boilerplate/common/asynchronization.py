@@ -9,7 +9,7 @@ from typing import Any, Callable, TypeVar
 
 from loguru import logger
 
-from python_web_service_boilerplate.configuration.thread_pool_configuration import executor
+from python_web_service_boilerplate.configuration.thread_pool import executor
 
 
 def done_callback(future: Future[Any] | Task[Any]) -> None:

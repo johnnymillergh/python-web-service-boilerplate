@@ -1,6 +1,6 @@
 import pytest
 
-from python_web_service_boilerplate.configuration.application_configuration import configure
+from python_web_service_boilerplate.configuration.application import configure
 
 
 def test_configure() -> None:

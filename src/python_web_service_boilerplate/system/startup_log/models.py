@@ -4,14 +4,14 @@ import os
 import platform
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Column, DateTime, Enum, Index, Integer, String, Text
+from sqlalchemy import BigInteger, Index, Integer, func
+from sqlmodel import Field, SQLModel
 
 from python_web_service_boilerplate.common.common_function import get_login_user, offline_environment
-from python_web_service_boilerplate.configuration.database_configuration import Base
 from python_web_service_boilerplate.system.common_models import Deleted
 
 
-class StartupLog(Base):
+class StartupLog(SQLModel, table=True):
     """
     StartupLog model for tracking application startup events.
 
@@ -24,40 +24,39 @@ class StartupLog(Base):
 
     __tablename__ = "startup_log"
 
-    id = (
-        Column(BigInteger, primary_key=True, index=True, comment="The primary key")
-        if not offline_environment()
-        else Column(Integer, primary_key=True, index=True, comment="The primary key")
+    id: int | None = Field(
+        default=None,
+        primary_key=True,
+        sa_type=BigInteger if not offline_environment() else Integer,
+        description="The primary key",
     )
-    current_user = Column(String(64), nullable=False, index=True, comment="Current system user", default=get_login_user)
-    hostname = Column(
-        String(64),
-        nullable=False,
+    current_user: str = Field(
+        max_length=64, index=True, default_factory=get_login_user, description="Current system user"
+    )
+    hostname: str = Field(
+        max_length=64,
         index=True,
-        comment="The hostname where the application is running",
-        default=platform.node,
+        default_factory=platform.node,
+        description="The hostname where the application is running",
     )
-    command_line = Column(Text, nullable=False, comment="The command line used to start the application")
-    current_working_directory = Column(
-        Text, nullable=False, default=os.getcwd, comment="The current working directory of the application"
+    command_line: str = Field(description="The command line used to start the application")
+    current_working_directory: str = Field(
+        default_factory=os.getcwd, description="The current working directory of the application"
     )
-    startup_time = Column(DateTime, nullable=False, default=datetime.now, comment="When the application started")
-    shutdown_time = Column(DateTime, nullable=True, comment="When the application shut down")
+    startup_time: datetime = Field(default_factory=datetime.now, description="When the application started")
+    shutdown_time: datetime | None = Field(default=None, description="When the application shut down")
 
     # Common audit fields
-    created_by = Column(String(64), nullable=False, default=get_login_user, comment="Created by")
-    created_at = Column(DateTime, nullable=False, default=datetime.now, comment="Creation timestamp")
-    updated_by = Column(String(64), nullable=True, default=get_login_user, comment="Last updated by")
-    updated_at = Column(
-        DateTime, nullable=True, default=datetime.now, onupdate=datetime.now, comment="Last update timestamp"
+    created_by: str = Field(max_length=64, default_factory=get_login_user, description="Created by")
+    created_at: datetime = Field(default_factory=datetime.now, description="Creation timestamp")
+    updated_by: str | None = Field(max_length=64, default_factory=get_login_user, description="Last updated by")
+    updated_at: datetime | None = Field(
+        default_factory=datetime.now, sa_column_kwargs={"onupdate": func.now()}, description="Last update timestamp"
     )
-    deleted = Column(Enum(Deleted), nullable=False, default=Deleted.N, comment="Deletion flag")
+    deleted: Deleted = Field(default=Deleted.N, description="Deletion flag")
 
     # Add indexes for common queries
-    __table_args__ = (
-        Index("ix_startup_logs_hostname_startup_time", "hostname", "startup_time"),
-        Index("ix_startup_logs_user_startup_time", "current_user", "startup_time"),
-    )
+    __table_args__ = (Index("ix_startup_logs_startup_time", "startup_time"),)
 
     def __str__(self) -> str:
         """String representation of the StartupLog instance."""

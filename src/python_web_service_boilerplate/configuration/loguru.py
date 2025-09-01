@@ -12,7 +12,7 @@ from loguru import logger
 
 from python_web_service_boilerplate.common.common_function import get_data_dir, get_module_name
 from python_web_service_boilerplate.common.trace import get_trace_id
-from python_web_service_boilerplate.configuration.application_configuration import application_conf
+from python_web_service_boilerplate.configuration.application import application_conf
 
 if TYPE_CHECKING:
     from loguru import Record

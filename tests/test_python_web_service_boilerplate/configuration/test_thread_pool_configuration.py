@@ -2,7 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from python_web_service_boilerplate.common.asynchronization import done_callback
-from python_web_service_boilerplate.configuration.thread_pool_configuration import (
+from python_web_service_boilerplate.configuration.thread_pool import (
     cleanup,
     configure,
     executor,

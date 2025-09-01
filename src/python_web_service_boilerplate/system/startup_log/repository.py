@@ -8,7 +8,7 @@ from loguru import logger
 from sqlalchemy import delete, select, update
 
 from python_web_service_boilerplate.common.common_function import get_module_name
-from python_web_service_boilerplate.configuration.database_configuration import (
+from python_web_service_boilerplate.configuration.database import (
     async_db_context,
 )
 from python_web_service_boilerplate.system.startup_log.models import StartupLog

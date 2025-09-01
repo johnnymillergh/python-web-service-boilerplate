@@ -10,7 +10,7 @@ from starlette.exceptions import HTTPException
 
 from python_web_service_boilerplate.common.common_function import get_module_name
 from python_web_service_boilerplate.common.profiling import async_elapsed_time, elapsed_time
-from python_web_service_boilerplate.configuration.application_configuration import pyproject_toml
+from python_web_service_boilerplate.configuration.application import pyproject_toml
 from python_web_service_boilerplate.system.auth.models import User
 from python_web_service_boilerplate.system.auth.repository import get_user_by_username, save_user
 from python_web_service_boilerplate.system.auth.schemas import AuthTokenResponse, JWTPayload, UserRegistration
@@ -39,7 +39,7 @@ __TYPE = "Bearer"
 @async_elapsed_time("WARNING")
 async def login(credentials: HTTPBasicCredentials) -> AuthTokenResponse:
     result = await get_user_by_username(credentials.username)
-    user: User | None = result.scalar()
+    user: User | None = result.first()
     if not user:
         logger.warning(f"User not found by username: {credentials.username}")
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Invalid username or password")

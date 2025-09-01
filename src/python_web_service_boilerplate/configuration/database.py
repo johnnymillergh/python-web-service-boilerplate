@@ -9,16 +9,15 @@ from loguru import logger
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import (
-    AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from sqlalchemy.orm import sessionmaker
+from sqlmodel import Session, SQLModel
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from python_web_service_boilerplate.common.common_function import get_data_dir, get_module_name, offline_environment
-from python_web_service_boilerplate.configuration.application_configuration import application_conf
-
-Base = declarative_base()
+from python_web_service_boilerplate.configuration.application import application_conf
 
 DATABASE_URL = (
     (
@@ -57,7 +56,9 @@ sync_engine: Engine = create_engine(
     echo=application_conf.get_bool("database.sql_log_enabled"),
 )
 
-_SessionLocal = sessionmaker(bind=sync_engine, autocommit=False, autoflush=False, expire_on_commit=False)
+_SessionLocal = sessionmaker(
+    bind=sync_engine, class_=Session, autocommit=False, autoflush=False, expire_on_commit=False
+)
 
 # Async engine and session setup
 __async_engine = create_async_engine(
@@ -70,7 +71,9 @@ __async_engine = create_async_engine(
     echo=application_conf.get_bool("database.sql_log_enabled"),
 )
 
-_AsyncSessionLocal = async_sessionmaker(bind=__async_engine, autocommit=False, autoflush=False, expire_on_commit=False)
+_AsyncSessionLocal = async_sessionmaker(
+    bind=__async_engine, class_=AsyncSession, autocommit=False, autoflush=False, expire_on_commit=False
+)
 
 
 def get_db() -> Generator[Session, None, None]:
@@ -93,6 +96,8 @@ async def configure() -> None:
     Initialize the database connection and create all tables if not exist.
     >>> from sqlalchemy.engine.create import create_engine
     >>> create_engine()
+    >>> from sqlalchemy.ext.asyncio import create_async_engine
+    >>> create_async_engine()
     >>> from sqlalchemy.pool.impl import QueuePool
     >>> # QueuePool is the default sync pool implementation
     >>> QueuePool.__init__()
@@ -105,7 +110,7 @@ async def configure() -> None:
         with db_context() as session:
             result = session.execute(text("SELECT 1;"))
             logger.warning("Creating all tables if not exist...")
-            Base.metadata.create_all(sync_engine)
+            SQLModel.metadata.create_all(sync_engine)
         logger.warning(f"Sync connection initialized successfully, name: {sync_engine.name}, result: {result.all()}")
     except Exception as e:
         logger.error(f"Failed to initialize sync connection: {e!s}", e)

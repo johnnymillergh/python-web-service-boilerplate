@@ -30,6 +30,12 @@ repos:
         entry: poetry check
         pass_filenames: false
         files: ^(.*/)?(poetry\.lock|pyproject\.toml)$
+      - id: ruff-fix-imports
+        name: Ruff Fix Imports
+        stages: [ pre-commit ]
+        language: system
+        entry: poetry run ruff check --select I --fix
+        types: [ python ]
       - id: ruff-check-fix
         name: Ruff Check and Fix
         stages: [ pre-commit ]
