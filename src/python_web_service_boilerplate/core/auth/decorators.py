@@ -29,7 +29,7 @@ def require_scopes(required_scopes: set[str]) -> Callable[[F], F]:
                 logger.debug("User has admin scope, all access granted")
                 return
             intersection = required_scopes.intersection(user_scopes)
-            if len(intersection) == 0:
+            if not intersection:
                 logger.warning(f"User missing scopes required: {required_scopes}. User has: {user_scopes}")
                 joined_scopes = " / ".join(required_scopes)
                 raise HTTPException(
