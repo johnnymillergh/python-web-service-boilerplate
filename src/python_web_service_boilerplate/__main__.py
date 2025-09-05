@@ -40,9 +40,10 @@ from python_web_service_boilerplate.configuration.thread_pool import (
 from python_web_service_boilerplate.configuration.thread_pool import (
     configure as configure_thread_pool,
 )
-from python_web_service_boilerplate.system.auth.middleware import AuthMiddleware
-from python_web_service_boilerplate.system.startup_log.models import StartupLog
-from python_web_service_boilerplate.system.startup_log.repository import (
+from python_web_service_boilerplate.core.auth.decorators import require_scopes
+from python_web_service_boilerplate.core.auth.middleware import AuthMiddleware
+from python_web_service_boilerplate.core.startup_log.models import StartupLog
+from python_web_service_boilerplate.core.startup_log.repository import (
     retain_startup_log,
     save_startup_log,
     update_shutdown_time,
@@ -111,6 +112,7 @@ app.add_middleware(TraceIDMiddleware)
 
 
 @app.get("/hello")
+@require_scopes({"core:read"})
 async def root() -> dict[str, str]:
     return {"message": f"Hello World from {get_module_name()}"}
 

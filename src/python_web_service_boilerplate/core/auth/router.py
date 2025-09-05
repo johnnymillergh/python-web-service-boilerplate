@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
-from python_web_service_boilerplate.system.auth.schemas import AuthTokenResponse, UserRegistration
-from python_web_service_boilerplate.system.auth.service import create_user
-from python_web_service_boilerplate.system.auth.service import login as auth_login
+from python_web_service_boilerplate.core.auth.schemas import AuthTokenResponse, UserRegistration
+from python_web_service_boilerplate.core.auth.service import create_user
+from python_web_service_boilerplate.core.auth.service import login as auth_login
 
 router = APIRouter(prefix="/api/v1")
 http_basic = HTTPBasic()

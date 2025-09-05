@@ -8,7 +8,7 @@ from sqlalchemy import BigInteger, Index, Integer, func
 from sqlmodel import Field, SQLModel
 
 from python_web_service_boilerplate.common.common_function import get_login_user, offline_environment
-from python_web_service_boilerplate.system.common_models import Deleted
+from python_web_service_boilerplate.core.common_models import Deleted
 
 
 class StartupLog(SQLModel, table=True):

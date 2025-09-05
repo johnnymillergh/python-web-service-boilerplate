@@ -48,8 +48,8 @@ def test_hello_with_invalid_token_with_expired_date(test_client: TestClient, pyt
     response = test_client.get(
         "/hello",
         headers={
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJweXRlc3RfdXNlciIsImV4cGlyZXNfY"
-            "XQiOiIyMDI1LTA4LTI0VDA5OjQ0OjI2Ljc5Njg5OSJ9.E0p_HjIxNiP1L-TkEoIrNfo92XdzlUYkrapT0OI-nbQ"
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZWF0IjoiMjAyNS0w"
+            "OC0yNFQwOTo0NDoyNi43OTY4OTkiLCJzY3AiOiJ1c2VyOnJlYWQifQ.XcFLkk3Kvr-5Mdso-l7aDfw-swFqzqlOvjF6zMNK85Q"
         },
     )
     logger.info(f"Hello response: {response}, {response.json()}")

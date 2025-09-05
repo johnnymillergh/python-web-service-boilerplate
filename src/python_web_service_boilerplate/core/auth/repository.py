@@ -2,8 +2,8 @@ from sqlalchemy import ScalarResult
 from sqlmodel import select
 
 from python_web_service_boilerplate.configuration.database import async_db_context
-from python_web_service_boilerplate.system.auth.models import User
-from python_web_service_boilerplate.system.common_models import Deleted
+from python_web_service_boilerplate.core.auth.models import User
+from python_web_service_boilerplate.core.common_models import Deleted
 
 
 async def get_user_by_username(username: str) -> ScalarResult[User]:

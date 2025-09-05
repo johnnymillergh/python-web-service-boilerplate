@@ -11,8 +11,8 @@ from starlette.testclient import TestClient
 
 from python_web_service_boilerplate.__main__ import app
 from python_web_service_boilerplate.common.common_function import PROJECT_ROOT_PATH, get_module_name
-from python_web_service_boilerplate.system.auth.schemas import UserRegistration
-from python_web_service_boilerplate.system.auth.service import create_user
+from python_web_service_boilerplate.core.auth.schemas import UserRegistration
+from python_web_service_boilerplate.core.auth.service import create_user
 
 
 @pytest.hookimpl(optionalhook=True)
@@ -24,6 +24,7 @@ async def pytest_user() -> UserRegistration:
         password=pswd,
         email="pytest@test.com",
         full_name="pytest user",
+        scopes=["admin"],
     )
     try:
         await create_user(user_registration)
