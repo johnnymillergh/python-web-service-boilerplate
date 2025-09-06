@@ -24,8 +24,11 @@ if [[ ! -d "src/python_web_service_boilerplate" ]]; then
 fi
 
 # Prompt for new project name
-echo -e "${YELLOW}Please enter your desired project name (use snake_case, e.g., 'my_awesome_project'):${NC}"
-read -p "Project name: " NEW_PROJECT_NAME
+NEW_PROJECT_NAME="$1"
+if [[ -z "$NEW_PROJECT_NAME" ]]; then
+    echo -e "${YELLOW}Please enter your desired project name (use snake_case, e.g., 'my_awesome_project'):${NC}"
+    read -p "Project name: " NEW_PROJECT_NAME
+fi
 
 # Validate project name
 if [[ -z "$NEW_PROJECT_NAME" ]]; then
