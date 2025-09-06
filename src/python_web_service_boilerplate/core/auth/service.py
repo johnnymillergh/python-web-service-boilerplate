@@ -9,7 +9,8 @@ from passlib.handlers.pbkdf2 import pbkdf2_sha256
 from starlette.exceptions import HTTPException
 
 from python_web_service_boilerplate.common.common_function import get_module_name
-from python_web_service_boilerplate.common.profiling import async_elapsed_time, elapsed_time
+from python_web_service_boilerplate.common.profiling import elapsed_time
+from python_web_service_boilerplate.common.router_loader import ALL_SCOPES
 from python_web_service_boilerplate.configuration.application import pyproject_toml
 from python_web_service_boilerplate.core.auth.models import User
 from python_web_service_boilerplate.core.auth.repository import get_user_by_username, save_user
@@ -37,7 +38,7 @@ def verify_token(token: str) -> JWTPayload:
 __TYPE = "Bearer"
 
 
-@async_elapsed_time("WARNING")
+@elapsed_time("WARNING")
 async def login(credentials: HTTPBasicCredentials) -> AuthTokenResponse:
     result = await get_user_by_username(credentials.username)
     user: User | None = result.first()
@@ -52,7 +53,7 @@ async def login(credentials: HTTPBasicCredentials) -> AuthTokenResponse:
     return AuthTokenResponse(access_token=token, token_type=__TYPE, expires_in=86400)  # 24 hours
 
 
-@async_elapsed_time("WARNING")
+@elapsed_time("WARNING")
 async def create_user(user_registration: UserRegistration) -> UserRegistration:
     existing_user = await get_user_by_username(user_registration.username)
     if existing_user.one_or_none():
@@ -63,7 +64,7 @@ async def create_user(user_registration: UserRegistration) -> UserRegistration:
         password=pbkdf2_sha256.hash(user_registration.password),
         email=user_registration.email,
         full_name=user_registration.full_name,
-        scopes=",".join(user_registration.scopes) if user_registration.scopes else "user:read",
+        scopes=",".join(user_registration.scopes) if user_registration.scopes else ",".join(ALL_SCOPES),
     )
     await save_user(new_user)
     logger.info(f"Created new user: {new_user.username}")

@@ -112,7 +112,7 @@ app.add_middleware(TraceIDMiddleware)
 
 
 @app.get("/hello")
-@require_scopes({"core:read"})
+@require_scopes({"user:read"})
 async def root() -> dict[str, str]:
     return {"message": f"Hello World from {get_module_name()}"}
 
