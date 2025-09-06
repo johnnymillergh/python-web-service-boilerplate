@@ -32,7 +32,7 @@ Here are the highlights of **python_web_service_boilerplate**:
 * SQLModel (SQLAlchemy) with async support
 * Alembic - Database migration tool
 * PostgreSQL support via psycopg3 and asyncpg
-* SQLite support via aiosqlit
+* SQLite support via aiosqlite
 * JSON serialization with orjson for performance
 
 ### Data Processing & Analysis
