@@ -1,5 +1,6 @@
 name: Publish docker image
-
+permissions:
+  packages: write
 on:
   push:
     tags: ["*"]
