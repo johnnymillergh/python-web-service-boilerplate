@@ -1,0 +1,22 @@
+name: "Init Project on Windows"
+permissions:
+  contents: read
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+      - 'release/**'
+      - 'hotfix/**'
+
+jobs:
+  build:
+    name: "Init New Project on Windows"
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+      - name: Run Init Script
+        shell: powershell
+        run: powershell -File .\init_project.ps1 -ProjectName "my_new_awesome_project"

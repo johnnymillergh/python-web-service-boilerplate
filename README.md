@@ -1,19 +1,19 @@
 ![Python Web Service Boilerplate Social Image](python-web-service-boilerplate.png)
-[![GitHub release](https://img.shields.io/github/release/johnnymillergh/python_web_service_boilerplate.svg)](https://github.com/johnnymillergh/python_web_service_boilerplate/releases)
-[![Github Actions workflow status](https://github.com/johnnymillergh/python_web_service_boilerplate/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/johnnymillergh/python_web_service_boilerplate/actions)
-[![GitHub issues](https://img.shields.io/github/issues/johnnymillergh/python_web_service_boilerplate)](https://github.com/johnnymillergh/python_web_service_boilerplate/issues)
-[![GitHub forks](https://img.shields.io/github/forks/johnnymillergh/python_web_service_boilerplate)](https://github.com/johnnymillergh/python_web_service_boilerplate/network)
-[![GitHub stars](https://img.shields.io/github/stars/johnnymillergh/python_web_service_boilerplate)](https://github.com/johnnymillergh/python_web_service_boilerplate)
-[![GitHub license](https://img.shields.io/github/license/johnnymillergh/python_web_service_boilerplate)](https://github.com/johnnymillergh/python_web_service_boilerplate/blob/main/LICENSE)
-[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/johnnymillergh/python_web_service_boilerplate.svg?style=popout)](https://github.com/johnnymillergh/python_web_service_boilerplate)
-[![GitHub repo size](https://img.shields.io/github/repo-size/johnnymillergh/python_web_service_boilerplate.svg)](https://github.com/johnnymillergh/python_web_service_boilerplate)
-[![Twitter](https://img.shields.io/twitter/url/https/github.com/johnnymillergh/python_web_service_boilerplate?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fjohnnymillergh%2Fpython_boilerplate)
+[![GitHub release](https://img.shields.io/github/release/johnnymillergh/python-web-service-boilerplate.svg)](https://github.com/johnnymillergh/python-web-service-boilerplate/releases)
+[![Github Actions workflow status](https://github.com/johnnymillergh/python-web-service-boilerplate/actions/workflows/python-ci-with-poetry.yml/badge.svg?branch=main)](https://github.com/johnnymillergh/python-web-service-boilerplate/actions)
+[![GitHub issues](https://img.shields.io/github/issues/johnnymillergh/python-web-service-boilerplate)](https://github.com/johnnymillergh/python-web-service-boilerplate/issues)
+[![GitHub forks](https://img.shields.io/github/forks/johnnymillergh/python-web-service-boilerplate)](https://github.com/johnnymillergh/python-web-service-boilerplate/network)
+[![GitHub stars](https://img.shields.io/github/stars/johnnymillergh/python-web-service-boilerplate)](https://github.com/johnnymillergh/python-web-service-boilerplate)
+[![GitHub license](https://img.shields.io/github/license/johnnymillergh/python-web-service-boilerplate)](https://github.com/johnnymillergh/python-web-service-boilerplate/blob/main/LICENSE)
+[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/johnnymillergh/python-web-service-boilerplate.svg?style=popout)](https://github.com/johnnymillergh/python-web-service-boilerplate)
+[![GitHub repo size](https://img.shields.io/github/repo-size/johnnymillergh/python-web-service-boilerplate.svg)](https://github.com/johnnymillergh/python-web-service-boilerplate)
+[![X](https://img.shields.io/twitter/url/https/github.com/johnnymillergh/python-web-service-boilerplate?style=social)](https://x.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fjohnnymillergh%2Fpython-web-service-boilerplate)
 
 # Python Web Service Boilerplate
 
 **python_web_service_boilerplate** is a boilerplate project for Python web service. Based on template [sourcery-ai/python-best-practices-cookiecutter](https://github.com/sourcery-ai/python-best-practices-cookiecutter).
 
-[Official Docker Image](https://github.com/todo)
+[Docker Image](https://github.com/johnnymillergh?tab=packages&repo_name=python-web-service-boilerplate)
 
 ## Features
 
@@ -29,9 +29,10 @@ Here are the highlights of **python_web_service_boilerplate**:
 
 ### Database & ORM
 
-* SQLAlchemy with async support - Modern Python SQL toolkit
+* SQLModel (SQLAlchemy) with async support
 * Alembic - Database migration tool
-* PostgreSQL support via psycopg2 and asyncpg
+* PostgreSQL support via psycopg3 and asyncpg
+* SQLite support via aiosqlite
 * JSON serialization with orjson for performance
 
 ### Data Processing & Analysis
@@ -248,21 +249,15 @@ typing_extensions 4.14.1   4.15.0    wheel
    $ mypy --install-types
    ```
 
-## Maintainers
-
-[@johnnymillergh](https://github.com/johnnymillergh).
-
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/johnnymillergh/python_web_service_boilerplate/issues/new).
+Feel free to dive in! [Open an issue](https://github.com/johnnymillergh/python-web-service-boilerplate/issues/new).
 
 ### Contributors
 
 This project exists thanks to all the people who contribute.
 
-- Johnny Miller [[@johnnymillergh](https://github.com/johnnymillergh)]
-- …
-
+[![Repository contributors](https://contrib.rocks/image?repo=johnnymillergh/python-web-service-boilerplate)](https://github.com/johnnymillergh/python-web-service-boilerplate/graphs/contributors)
 
 ### Sponsors
 

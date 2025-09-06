@@ -1,0 +1,23 @@
+name: "Init Project on Ubuntu"
+permissions:
+  contents: read
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+      - 'release/**'
+      - 'hotfix/**'
+
+jobs:
+  build:
+    name: "Init New Project on Ubuntu"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+      - name: Run Init Script
+        run: |
+          chmod +x ./init_project.sh
+          ./init_project.sh my_new_awesome_project
