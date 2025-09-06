@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-web-service-boilerplate"
-version = "0.1.0"
+version = "1.0.0"
 description = "Python web service boilerplate using FastAPI"
 authors = ["Johnny Miller <johnnysviva@outlook.com>"]
 license = "Apache-2.0"
