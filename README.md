@@ -249,21 +249,15 @@ typing_extensions 4.14.1   4.15.0    wheel
    $ mypy --install-types
    ```
 
-## Maintainers
-
-[@johnnymillergh](https://github.com/johnnymillergh).
-
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/johnnymillergh/python_web_service_boilerplate/issues/new).
+Feel free to dive in! [Open an issue](https://github.com/johnnymillergh/python-web-service-boilerplate/issues/new).
 
 ### Contributors
 
 This project exists thanks to all the people who contribute.
 
-- Johnny Miller [[@johnnymillergh](https://github.com/johnnymillergh)]
-- …
-
+[![Repository contributors](https://contrib.rocks/image?repo=johnnymillergh/python-web-service-boilerplate)](https://github.com/johnnymillergh/python-web-service-boilerplate/graphs/contributors)
 
 ### Sponsors
 
