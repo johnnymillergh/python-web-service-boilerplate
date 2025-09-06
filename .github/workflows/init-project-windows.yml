@@ -1,4 +1,6 @@
 name: "Init Project on Windows"
+permissions:
+  contents: read
 on:
   pull_request:
   push:
