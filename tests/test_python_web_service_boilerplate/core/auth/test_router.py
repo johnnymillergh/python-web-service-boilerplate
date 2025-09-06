@@ -6,7 +6,7 @@ from faker import Faker
 from loguru import logger
 from starlette.testclient import TestClient
 
-from python_web_service_boilerplate.system.auth.schemas import AuthTokenResponse, UserRegistration
+from python_web_service_boilerplate.core.auth.schemas import AuthTokenResponse, UserRegistration
 
 user_registration: UserRegistration | None
 

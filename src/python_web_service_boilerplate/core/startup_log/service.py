@@ -5,8 +5,8 @@ import orjson
 from loguru import logger
 
 from python_web_service_boilerplate.common.middleware import get_current_request
-from python_web_service_boilerplate.system.startup_log.repository import stream_all_startup_logs
-from python_web_service_boilerplate.system.startup_log.schemas import StartupLogSchema
+from python_web_service_boilerplate.core.startup_log.repository import stream_all_startup_logs
+from python_web_service_boilerplate.core.startup_log.schemas import StartupLogSchema
 
 
 async def log_streamer() -> AsyncGenerator[str, None]:

@@ -3,12 +3,11 @@ name: Python CI with Poetry
 on:
   pull_request:
   push:
+    tags:
+      - '*'
     branches:
       - 'main'
       - 'develop'
-      - 'feature/**'
-      - 'release/**'
-      - 'hotfix/**'
     paths-ignore:
       - '**.md'
       - '_config.yml'

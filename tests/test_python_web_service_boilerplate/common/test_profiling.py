@@ -4,7 +4,6 @@ from time import sleep
 import pytest
 
 from python_web_service_boilerplate.common.profiling import (
-    async_elapsed_time,
     cpu_profile,
     elapsed_time,
     mem_profile,
@@ -26,7 +25,9 @@ def time_consuming_function_raising_error() -> None:
     raise RuntimeError("Unknown exception")
 
 
-@async_elapsed_time(level="WARNING")
+@cpu_profile()
+@mem_profile()
+@elapsed_time(level="WARNING")
 async def async_time_consuming_function(input_string: str) -> str:
     await asyncio.sleep(1)
     if "exception" in input_string:
