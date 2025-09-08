@@ -2,10 +2,12 @@ from datetime import datetime
 from http import HTTPStatus
 
 import arrow
+from advanced_alchemy import service
 from fastapi.security import HTTPBasicCredentials
 from jose import jwt
 from loguru import logger
 from passlib.handlers.pbkdf2 import pbkdf2_sha256
+from sqlalchemy import select
 from starlette.exceptions import HTTPException
 
 from python_web_service_boilerplate.common.common_function import get_module_name
@@ -13,8 +15,9 @@ from python_web_service_boilerplate.common.profiling import elapsed_time
 from python_web_service_boilerplate.common.router_loader import ALL_SCOPES
 from python_web_service_boilerplate.configuration.application import pyproject_toml
 from python_web_service_boilerplate.core.auth.models import User
-from python_web_service_boilerplate.core.auth.repository import get_user_by_username, save_user
+from python_web_service_boilerplate.core.auth.repository import Repository, get_user_by_username, save_user
 from python_web_service_boilerplate.core.auth.schemas import AuthTokenResponse, JWTPayload, UserRegistration
+from python_web_service_boilerplate.core.common_models import Deleted
 
 # Secret key for JWT
 _SECRET_KEY = f"SECRET_KEY::{get_module_name()}::{pyproject_toml['tool']['poetry']['description']}"
@@ -69,3 +72,26 @@ async def create_user(user_registration: UserRegistration) -> UserRegistration:
     await save_user(new_user)
     logger.info(f"Created new user: {new_user.username}")
     return user_registration
+
+
+class UserService(service.SQLAlchemyAsyncRepositoryService[User, Repository]):
+    repository_type = Repository
+
+    @elapsed_time("WARNING")
+    async def create_user(self, user_registration: UserRegistration) -> UserRegistration:
+        existing_user = await self.get_one_or_none(
+            statement=select(1).where(User.username == user_registration.username, User.deleted == Deleted.N)
+        )
+        if existing_user:
+            logger.warning(f"Username already exists: {user_registration.username}")
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Username already exists")
+        new_user = User(
+            username=user_registration.username,
+            password=pbkdf2_sha256.hash(user_registration.password),
+            email=user_registration.email,
+            full_name=user_registration.full_name,
+            scopes=",".join(user_registration.scopes) if user_registration.scopes else ",".join(ALL_SCOPES),
+        )
+        await self.create(new_user)
+        logger.info(f"Created new user: {new_user.username}")
+        return user_registration

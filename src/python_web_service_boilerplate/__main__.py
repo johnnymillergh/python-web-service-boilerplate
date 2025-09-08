@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from datetime import timedelta
 from pathlib import Path
 
+from advanced_alchemy.extensions.fastapi import AdvancedAlchemy
 from fastapi import FastAPI
 from loguru import logger
 
@@ -25,10 +26,11 @@ from python_web_service_boilerplate.configuration.apscheduler import (
 from python_web_service_boilerplate.configuration.apscheduler import (
     configure as configure_apscheduler,
 )
-from python_web_service_boilerplate.configuration.database import (
+from python_web_service_boilerplate.configuration.database import alchemy_config
+from python_web_service_boilerplate.configuration.database_obsolete import (
     cleanup as database_cleanup,
 )
-from python_web_service_boilerplate.configuration.database import (
+from python_web_service_boilerplate.configuration.database_obsolete import (
     configure as configure_database,
 )
 from python_web_service_boilerplate.configuration.loguru import (
@@ -109,6 +111,7 @@ app = FastAPI(lifespan=lifespan)
 # Add trace ID middleware to automatically handle request tracing
 app.add_middleware(AuthMiddleware)
 app.add_middleware(TraceIDMiddleware)
+alchemy = AdvancedAlchemy(config=alchemy_config, app=app)
 
 
 @app.get("/hello")

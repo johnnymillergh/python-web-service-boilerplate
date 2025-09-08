@@ -18,7 +18,7 @@ src = str(Path(__file__).resolve().parents[2])
 logger.warning(f"Appending src path `{src}` into sys.path before importing application modules")
 sys.path.append(src)  # Insert <.>/src
 # now application modules can be imported
-from python_web_service_boilerplate.configuration.database import ASYNC_DATABASE_URL
+from python_web_service_boilerplate.configuration.database_obsolete import ASYNC_DATABASE_URL
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

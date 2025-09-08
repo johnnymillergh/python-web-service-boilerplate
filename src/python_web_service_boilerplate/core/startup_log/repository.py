@@ -9,7 +9,7 @@ from sqlalchemy import delete, select
 from sqlmodel import and_
 
 from python_web_service_boilerplate.common.common_function import get_module_name
-from python_web_service_boilerplate.configuration.database import (
+from python_web_service_boilerplate.configuration.database_obsolete import (
     async_db_context,
 )
 from python_web_service_boilerplate.core.startup_log.models import StartupLog
