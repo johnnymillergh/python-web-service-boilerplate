@@ -21,8 +21,6 @@ uvicorn = "==0.35.0"
 # ORM & Database
 advanced-alchemy = "==1.6.2"
 sqlmodel = "==0.0.24"
-sqlalchemy = {extras = ["asyncio"], version = "==2.0.43"}
-alembic = "==1.16.5"
 psycopg = {extras = ["binary", "pool"], version = "==3.2.10"}
 asyncpg = "==0.30.0"
 aiosqlite = "==0.21.0"
@@ -55,7 +53,6 @@ humanize = "==4.13.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "==1.17.1"
-sqlalchemy = {extras = ["mypy"], version = "==2.0.43"}
 pre-commit = "==4.3.0"
 pyinstrument = "==5.1.1"
 
@@ -86,7 +83,7 @@ files = ["src", "tests"]
 cache_dir = "./build/.mypy_cache"
 ignore_missing_imports = true
 # https://docs.pydantic.dev/latest/mypy_plugin/#configuring-the-plugin
-plugins = ["pydantic.mypy", "sqlalchemy.ext.mypy.plugin"]
+plugins = ["pydantic.mypy"]
 follow_imports = "silent"
 warn_redundant_casts = true
 warn_unused_ignores = true
