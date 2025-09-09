@@ -7,15 +7,17 @@ from loguru import logger
 from python_web_service_boilerplate.__main__ import alchemy
 from python_web_service_boilerplate.core.auth.schemas import AuthTokenResponse, UserRegistration
 from python_web_service_boilerplate.core.auth.service import UserService
-from python_web_service_boilerplate.core.auth.service import login as auth_login
 
 router = APIRouter(prefix="/api/v1")
 http_basic = HTTPBasic()
 
 
 @router.post("/token")
-async def login(credentials: Annotated[HTTPBasicCredentials, Depends(http_basic)]) -> AuthTokenResponse:
-    return await auth_login(credentials)
+async def login(
+    credentials: Annotated[HTTPBasicCredentials, Depends(http_basic)],
+    user_service: Annotated[UserService, Depends(alchemy.provide_service(UserService))],
+) -> AuthTokenResponse:
+    return await user_service.login(credentials)
 
 
 @router.post("/users")

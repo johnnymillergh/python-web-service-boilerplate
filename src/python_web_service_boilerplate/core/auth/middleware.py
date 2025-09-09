@@ -5,7 +5,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 from python_web_service_boilerplate.core.auth.schemas import JWTPayload
-from python_web_service_boilerplate.core.auth.service import verify_token
+from python_web_service_boilerplate.core.auth.service import UserService
 
 _PUBLIC_ENDPOINTS = {
     "POST /api/v1/token",
@@ -32,7 +32,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         token = auth_header.split(" ")[1]
         try:
-            jwt_payload: JWTPayload = verify_token(token)
+            jwt_payload: JWTPayload = UserService.verify_token(token)
         except HTTPException as e:
             return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
         # Attach user to request
