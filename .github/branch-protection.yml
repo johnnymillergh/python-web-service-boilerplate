@@ -1,0 +1,65 @@
+# Branch Protection Configuration for python-web-service-boilerplate
+# This file documents the required branch protection rules for this repository.
+# 
+# These rules should be applied through GitHub's branch protection settings
+# or using tools like terraform-github-provider, probot-settings, or GitHub CLI.
+#
+# Repository: johnnymillergh/python-web-service-boilerplate
+# Documentation: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/managing-a-branch-protection-rule
+
+branch_protection_rules:
+  # Protection for release branches
+  - pattern: "release/**"
+    protection:
+      required_status_checks:
+        strict: true
+        contexts:
+          - "code-quality-check"
+          - "fastapi-smoke-testing"
+          - "check-versions"
+      enforce_admins: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: false
+        require_last_push_approval: false
+      restrictions: null
+      allow_force_pushes: false
+      allow_deletions: false
+      block_creations: false
+      required_conversation_resolution: true
+      lock_branch: false
+      allow_fork_syncing: true
+
+  # Protection for main branch (if not already configured)
+  - pattern: "main"
+    protection:
+      required_status_checks:
+        strict: true
+        contexts:
+          - "code-quality-check"
+          - "fastapi-smoke-testing"
+          - "check-versions"
+      enforce_admins: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: false
+        require_last_push_approval: false
+      restrictions: null
+      allow_force_pushes: false
+      allow_deletions: false
+      block_creations: false
+      required_conversation_resolution: true
+      lock_branch: false
+      allow_fork_syncing: true
+
+# Example GitHub CLI commands to apply these settings:
+# gh api repos/johnnymillergh/python-web-service-boilerplate/branches/release%2F*/protection \
+#   --method PUT \
+#   --field required_status_checks='{"strict":true,"contexts":["code-quality-check","fastapi-smoke-testing","check-versions"]}' \
+#   --field enforce_admins=true \
+#   --field required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":true}' \
+#   --field restrictions=null \
+#   --field allow_force_pushes=false \
+#   --field allow_deletions=false

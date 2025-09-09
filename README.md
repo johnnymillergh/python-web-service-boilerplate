@@ -232,10 +232,32 @@ starlette         0.47.2   0.47.3    wheel
 typing_extensions 4.14.1   4.15.0    wheel
 ```
 
-## CI (Continuous Integration)
+## CI/CD (Continuous Integration/Continuous Deployment)
 
-- GitHub Actions are for building projects and running tests.
-- ~~[Travis CI](https://travis-ci.com/github/johnnymillergh/) is for publishing Docker Hub images of SNAPSHOT and RELEASE.~~
+### GitHub Actions Workflows
+
+- **Python CI**: Building projects and running tests on `main`, `develop` branches and pull requests
+- **Docker Publishing**: Automatically publishes Docker images on:
+  - Git tag pushes (for releases)
+  - Pushes to `release/**` branches (for release candidates)
+
+### Branch Protection
+
+This repository uses branch protection rules for:
+
+- **`main`** branch: Requires PR reviews and passing CI checks
+- **`release/**`** branches: Protected branches for release preparation
+  - Requires all CI checks to pass
+  - Requires at least 1 approving review
+  - Prevents force pushes and deletions
+
+Branch protection rules are documented in `.github/branch-protection.yml` and should be configured through GitHub's repository settings or using automation tools like GitHub CLI or Terraform.
+
+### Docker Images
+
+Docker images are published to [GitHub Packages](https://github.com/johnnymillergh?tab=packages&repo_name=python-web-service-boilerplate) automatically on:
+- Tagged releases
+- Release branch pushes (for testing release candidates)
 
 ## FAQ
 
