@@ -23,7 +23,6 @@ from python_web_service_boilerplate.core.common_models import Deleted
 # Secret key for JWT
 _SECRET_KEY = f"SECRET_KEY::{get_module_name()}::{pyproject_toml['tool']['poetry']['description']}"
 _ALGORITHM = "HS256"
-__TYPE = "Bearer"
 
 
 class UserService(service.SQLAlchemyAsyncRepositoryService[User, Repository]):
