@@ -11,14 +11,19 @@ from sqlmodel import and_
 
 from python_web_service_boilerplate.common.common_function import get_module_name
 from python_web_service_boilerplate.configuration.database import alchemy_config
-from python_web_service_boilerplate.configuration.database_obsolete import (
-    async_db_context,
-)
 from python_web_service_boilerplate.core.startup_log.models import StartupLog
 
 
 class Repository(repository.SQLAlchemyAsyncRepository[StartupLog]):
     model_type = StartupLog
+
+    @staticmethod
+    async def stream_all_startup_logs() -> AsyncGenerator[StartupLog, None]:
+        async with alchemy_config.get_session() as session:
+            result = await session.stream_scalars(select(StartupLog))
+            async for log in result:
+                logger.info(f"Retrieved startup logs, id: {log.id}")
+                yield log
 
 
 async def save_startup_log(startup_log: StartupLog) -> StartupLog:

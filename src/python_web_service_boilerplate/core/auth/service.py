@@ -58,7 +58,7 @@ class UserService(service.SQLAlchemyAsyncRepositoryService[User, Repository]):
             full_name=user_registration.full_name,
             scopes=",".join(user_registration.scopes) if user_registration.scopes else ",".join(ALL_SCOPES),
         )
-        await self.create(new_user)
+        await self.create(new_user, auto_commit=True)
         logger.info(f"Created new user: {new_user.username}")
         return user_registration
 
