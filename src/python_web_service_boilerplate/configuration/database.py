@@ -1,20 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator, Generator
-from contextlib import asynccontextmanager, contextmanager
+from collections.abc import Generator
+from contextlib import contextmanager
 from typing import Any
 
 import orjson
+from advanced_alchemy.extensions.fastapi import (
+    AsyncSessionConfig,
+    SQLAlchemyAsyncConfig,
+)
+from advanced_alchemy.extensions.starlette import EngineConfig
 from loguru import logger
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.ext.asyncio import (
-    async_sessionmaker,
-    create_async_engine,
-)
-from sqlalchemy.orm import sessionmaker
-from sqlmodel import Session, SQLModel
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import Session, sessionmaker
 
 from python_web_service_boilerplate.common.common_function import get_data_dir, get_module_name, offline_environment
 from python_web_service_boilerplate.configuration.application import application_conf
@@ -45,6 +44,21 @@ def orjson_serializer(obj: Any) -> str:
     return orjson.dumps(obj, option=orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_NAIVE_UTC).decode()
 
 
+alchemy_config = SQLAlchemyAsyncConfig(
+    connection_string=ASYNC_DATABASE_URL,
+    session_config=AsyncSessionConfig(expire_on_commit=False),
+    create_all=True,
+    engine_config=EngineConfig(
+        json_serializer=orjson_serializer,
+        json_deserializer=orjson.loads,
+        pool_use_lifo=True,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        echo=application_conf.get_bool("database.sql_log_enabled"),
+    ),
+)
+
+
 # Synchronous engine and session setup (backward compatibility)
 sync_engine: Engine = create_engine(
     DATABASE_URL,
@@ -55,40 +69,16 @@ sync_engine: Engine = create_engine(
     pool_recycle=3600,
     echo=application_conf.get_bool("database.sql_log_enabled"),
 )
-
 _SessionLocal = sessionmaker(
     bind=sync_engine, class_=Session, autocommit=False, autoflush=False, expire_on_commit=False
 )
 
-# Async engine and session setup
-__async_engine = create_async_engine(
-    ASYNC_DATABASE_URL,
-    json_serializer=orjson_serializer,
-    json_deserializer=orjson.loads,
-    pool_use_lifo=True,
-    pool_pre_ping=True,
-    pool_recycle=3600,
-    echo=application_conf.get_bool("database.sql_log_enabled"),
-)
 
-_AsyncSessionLocal = async_sessionmaker(
-    bind=__async_engine, class_=AsyncSession, autocommit=False, autoflush=False, expire_on_commit=False
-)
-
-
-def get_db() -> Generator[Session, None, None]:
+@contextmanager
+def get_sync_db() -> Generator[Session, None, None]:
+    """Sync context managers for manual session management."""
     with _SessionLocal() as session:
         yield session
-
-
-async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
-    async with _AsyncSessionLocal() as session:
-        yield session
-
-
-# Sync and Async context managers for manual session management
-db_context = contextmanager(get_db)
-async_db_context = asynccontextmanager(get_async_db)
 
 
 async def configure() -> None:
@@ -107,20 +97,19 @@ async def configure() -> None:
     Default the database connection configuration above.
     """
     try:
-        with db_context() as session:
+        with get_sync_db() as session:
             result = session.execute(text("SELECT 1;"))
-            logger.warning("Creating all tables if not exist...")
-            SQLModel.metadata.create_all(sync_engine)
         logger.warning(f"Sync connection initialized successfully, name: {sync_engine.name}, result: {result.all()}")
     except Exception as e:
         logger.error(f"Failed to initialize sync connection: {e!s}", e)
         raise
     try:
         # Test async connection
-        async with async_db_context() as session:
+        async with alchemy_config.get_session() as session:
             result = await session.execute(text("SELECT 1;"))
         logger.warning(
-            f"Async connection initialized successfully, name: {__async_engine.name}, result: {result.all()}"
+            f"Async connection initialized successfully, name: {alchemy_config.get_engine().name}, "
+            f"result: {result.all()}"
         )
     except Exception as e:
         logger.error(f"Failed to initialize async connection: {e!s}", e)
@@ -134,7 +123,7 @@ async def cleanup() -> None:
     except Exception as e:
         logger.error(f"Error disposing sync engine: {e!s}", e)
     try:
-        await __async_engine.dispose()
-        logger.warning(f"{__async_engine.name} async engine disposed")
+        await alchemy_config.close_engine()
+        logger.warning(f"{alchemy_config.get_engine().name} async engine disposed")
     except Exception as e:
         logger.error(f"Error disposing async engine: {e!s}", e)

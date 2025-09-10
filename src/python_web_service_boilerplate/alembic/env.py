@@ -4,12 +4,12 @@ import sys
 from logging.config import fileConfig
 from pathlib import Path
 
+from advanced_alchemy.base import AdvancedDeclarativeBase
 from alembic import context
 from loguru import logger
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-from sqlmodel import SQLModel
 
 # How to import the own model into myproject/alembic/env.py
 # https://stackoverflow.com/a/32218546/9728243
@@ -33,7 +33,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-target_metadata = SQLModel.metadata
+target_metadata = AdvancedDeclarativeBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

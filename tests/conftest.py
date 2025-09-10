@@ -1,4 +1,4 @@
-from collections.abc import Generator
+from collections.abc import AsyncGenerator, Generator
 from typing import Any
 
 import pytest
@@ -7,17 +7,39 @@ from _pytest.nodes import Node
 from fastapi_cloud_cli.commands.login import TokenResponse
 from loguru import logger
 from pyinstrument.profiler import Profiler
+from sqlalchemy.ext.asyncio.session import AsyncSession
 from starlette.testclient import TestClient
 
-from python_web_service_boilerplate.__main__ import app
+from python_web_service_boilerplate.__main__ import alchemy, app
 from python_web_service_boilerplate.common.common_function import PROJECT_ROOT_PATH, get_module_name
 from python_web_service_boilerplate.core.auth.schemas import UserRegistration
-from python_web_service_boilerplate.core.auth.service import create_user
+from python_web_service_boilerplate.core.auth.service import UserService
+
+
+@pytest_asyncio.fixture(scope="session")
+async def db_session() -> AsyncGenerator[AsyncSession, None]:
+    """Create a database session for testing."""
+    async with alchemy.with_async_session() as session:
+        yield session
+
+
+@pytest_asyncio.fixture(scope="session")
+async def db_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
+    """Create a transactional session that rolls back after each test."""
+    async with db_session.begin() as transaction:
+        yield db_session
+        await transaction.rollback()
+
+
+@pytest_asyncio.fixture(scope="session")
+async def user_service(db_transaction: AsyncSession) -> UserService:
+    """Create a UserService instance with a test database session."""
+    return UserService(session=db_transaction)
 
 
 @pytest.hookimpl(optionalhook=True)
 @pytest_asyncio.fixture(scope="session")
-async def pytest_user() -> UserRegistration:
+async def pytest_user(user_service: UserService) -> UserRegistration:
     pswd = "pytest"
     user_registration = UserRegistration(
         username="pytest_user",
@@ -27,7 +49,7 @@ async def pytest_user() -> UserRegistration:
         scopes=["admin"],
     )
     try:
-        await create_user(user_registration)
+        await user_service.create_user(user_registration)
     except Exception as e:
         logger.warning(f"Failed to create user, {e}")
     else:

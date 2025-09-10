@@ -2,33 +2,37 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Integer, Text, func
-from sqlmodel import Field, SQLModel
+from advanced_alchemy.extensions.fastapi import (
+    base,
+)
+from advanced_alchemy.types import DateTimeUTC
+from sqlalchemy import Text
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.sql.sqltypes import String
 
-from python_web_service_boilerplate.common.common_function import get_login_user, offline_environment
+from python_web_service_boilerplate.common.common_function import get_login_user
 from python_web_service_boilerplate.core.common_models import Deleted
 
 
-class User(SQLModel, table=True):
+class User(base.BigIntBase):
     __tablename__ = "user"
 
-    id: int | None = Field(
-        default=None,
-        primary_key=True,
-        sa_type=BigInteger if not offline_environment() else Integer,
-        description="The primary key",
-    )
-    username: str = Field(max_length=64, index=True, unique=True, description="The username")
-    password: str = Field(max_length=512, description="The password")
-    email: str = Field(max_length=256, index=True, description="The email address")
-    full_name: str = Field(max_length=128, description="The full name of the user")
-    scopes: str = Field(sa_type=Text, description="The scopes/permissions assigned to the user, comma-separated")
+    username: Mapped[str] = mapped_column(String(length=64), index=True, unique=True, comment="The username")
+    password: Mapped[str] = mapped_column(String(length=512), comment="The password")
+    email: Mapped[str] = mapped_column(String(length=256), index=True, comment="The email address")
+    full_name: Mapped[str] = mapped_column(String(length=128), comment="The full name of the user")
+    scopes: Mapped[str] = mapped_column(Text(), comment="The scopes/permissions assigned to the user, comma-separated")
 
     # Common audit fields
-    created_by: str = Field(default_factory=get_login_user, max_length=64, description="Created by")
-    created_at: datetime = Field(default_factory=datetime.now, description="Creation timestamp")
-    updated_by: str | None = Field(default_factory=get_login_user, max_length=64, description="Last updated by")
-    updated_at: datetime | None = Field(
-        default_factory=datetime.now, sa_column_kwargs={"onupdate": func.now()}, description="Last update timestamp"
+    created_by: Mapped[str] = mapped_column(String(length=64), default=get_login_user, comment="Created by")
+    created_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now().astimezone(), comment="Creation timestamp"
     )
-    deleted: Deleted = Field(default=Deleted.N, description="Deletion flag")
+    updated_by: Mapped[str | None] = mapped_column(String(64), default=get_login_user, comment="Last updated by")
+    updated_at: Mapped[datetime | None] = mapped_column(
+        DateTimeUTC(timezone=True),
+        default=lambda: datetime.now().astimezone(),
+        onupdate=lambda: datetime.now().astimezone(),
+        comment="Last update timestamp",
+    )
+    deleted: Mapped[Deleted] = mapped_column(default=Deleted.N, comment="Deletion flag")
