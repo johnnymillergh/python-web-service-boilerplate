@@ -21,10 +21,10 @@ services:
       start_period: 10s
   app:
     container_name: python-web-service-boilerplate
-    image: ghcr.io/johnnymillergh/python-web-service-boilerplate:latest
-#    build:
-#      context: .
-#      dockerfile: ./Dockerfile
+#    image: ghcr.io/johnnymillergh/python-web-service-boilerplate:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     command: bash -c "alembic upgrade head && fastapi run src/python_web_service_boilerplate/__main__.py --port 80"
     ports:
       - "8001:80"
