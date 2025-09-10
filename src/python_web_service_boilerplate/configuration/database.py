@@ -47,7 +47,6 @@ def orjson_serializer(obj: Any) -> str:
 alchemy_config = SQLAlchemyAsyncConfig(
     connection_string=ASYNC_DATABASE_URL,
     session_config=AsyncSessionConfig(expire_on_commit=False),
-    commit_mode="autocommit",
     create_all=True,
     engine_config=EngineConfig(
         json_serializer=orjson_serializer,
