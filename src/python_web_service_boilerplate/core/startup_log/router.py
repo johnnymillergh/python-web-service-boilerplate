@@ -14,11 +14,9 @@ router = APIRouter(prefix="/api/v1")
 
 @router.get("/startup_logs/stream")
 @require_scopes({"core:read"})
-async def stream_startup_logs(
-    startup_log_service: Annotated[StartupLogService, Depends(alchemy.provide_service(StartupLogService))],
-) -> StreamingResponse:
+async def stream_startup_logs() -> StreamingResponse:
     logger.info(f"{get_current_request().state.username} is accessing startup log stream")
-    return StreamingResponse(startup_log_service.log_streamer(), media_type="text/event-stream")
+    return StreamingResponse(StartupLogService.log_streamer(), media_type="text/event-stream")
 
 
 @router.get("/startup_logs/broken_stream")
