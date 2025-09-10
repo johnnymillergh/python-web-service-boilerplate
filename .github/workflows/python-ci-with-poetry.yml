@@ -41,7 +41,7 @@ jobs:
           || echo "Failed to install mypy types"
       - run: poetry run mypy
       - name: Python Tests with pytest
-        run: env LOG_LEVEL=INFO poetry run pytest --quiet --cov --cov-report term -n auto --benchmark-disable --dist=loadfile
+        run: env LOG_LEVEL=INFO poetry run pytest --quiet --cov --cov-report term -n 0 --benchmark-disable --dist=loadfile
       - name: Python Benchmark with pytest
         run: env LOG_LEVEL=ERROR poetry run pytest --capture=no --log-cli-level=ERROR -n 0 --benchmark-only
   fastapi-smoke-testing:
