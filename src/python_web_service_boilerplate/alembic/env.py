@@ -4,12 +4,12 @@ import sys
 from logging.config import fileConfig
 from pathlib import Path
 
+from advanced_alchemy.base import AdvancedDeclarativeBase
 from alembic import context
 from loguru import logger
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-from sqlmodel import SQLModel
 
 # How to import the own model into myproject/alembic/env.py
 # https://stackoverflow.com/a/32218546/9728243
@@ -18,7 +18,7 @@ src = str(Path(__file__).resolve().parents[2])
 logger.warning(f"Appending src path `{src}` into sys.path before importing application modules")
 sys.path.append(src)  # Insert <.>/src
 # now application modules can be imported
-from python_web_service_boilerplate.configuration.database_obsolete import ASYNC_DATABASE_URL
+from python_web_service_boilerplate.configuration.database import ASYNC_DATABASE_URL
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -33,7 +33,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-target_metadata = SQLModel.metadata
+target_metadata = AdvancedDeclarativeBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

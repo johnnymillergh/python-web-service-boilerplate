@@ -7,7 +7,6 @@ import arrow
 from advanced_alchemy import repository
 from loguru import logger
 from sqlalchemy import delete, select
-from sqlmodel import and_
 
 from python_web_service_boilerplate.common.common_function import get_module_name
 from python_web_service_boilerplate.configuration.database import alchemy_config
@@ -48,8 +47,9 @@ async def update_shutdown_time(startup_log: StartupLog | None) -> None:
 
 async def retain_startup_log() -> None:
     a_week_ago = arrow.now("local").shift(days=-7).floor("day").datetime
-    async with alchemy_config.get_session() as session:
-        await session.execute(delete(StartupLog).where(and_(StartupLog.startup_time < a_week_ago)))
+    async with alchemy_config.get_session() as db:
+        await db.execute(delete(StartupLog).where(StartupLog.startup_time < a_week_ago))
+        await db.commit()
     # the affected_rows is always 1 no matter how many rows were deleted
     logger.debug(
         f"The app [{get_module_name()}] retains recent 7 days of startup log. "

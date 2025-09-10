@@ -27,10 +27,10 @@ from python_web_service_boilerplate.configuration.apscheduler import (
     configure as configure_apscheduler,
 )
 from python_web_service_boilerplate.configuration.database import alchemy_config
-from python_web_service_boilerplate.configuration.database_obsolete import (
+from python_web_service_boilerplate.configuration.database import (
     cleanup as database_cleanup,
 )
-from python_web_service_boilerplate.configuration.database_obsolete import (
+from python_web_service_boilerplate.configuration.database import (
     configure as configure_database,
 )
 from python_web_service_boilerplate.configuration.loguru import (
