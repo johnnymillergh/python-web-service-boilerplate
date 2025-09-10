@@ -1,15 +1,12 @@
 from http import HTTPStatus
 
-import pytest
 from fastapi_cloud_cli.commands.login import TokenResponse
-from httpx import AsyncClient
 from loguru import logger
 from starlette.testclient import TestClient
 
 
-@pytest.mark.asyncio
-async def test_hello(async_client: AsyncClient) -> None:
-    response = await async_client.get("/hello")
+def test_hello(test_client: TestClient) -> None:
+    response = test_client.get("/hello")
     assert response.status_code == HTTPStatus.UNAUTHORIZED.value
     assert response.json() == {"detail": "Not authenticated"}
 

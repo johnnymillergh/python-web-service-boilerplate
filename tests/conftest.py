@@ -5,7 +5,6 @@ import pytest
 import pytest_asyncio
 from _pytest.nodes import Node
 from fastapi_cloud_cli.commands.login import TokenResponse
-from httpx import ASGITransport, AsyncClient
 from loguru import logger
 from pyinstrument.profiler import Profiler
 from sqlalchemy.ext.asyncio.session import AsyncSession
@@ -62,14 +61,6 @@ async def pytest_user(user_service: UserService) -> UserRegistration:
 def test_client() -> Generator[TestClient, None, None]:
     with TestClient(app) as test_client:
         yield test_client
-
-
-@pytest_asyncio.fixture(scope="session")
-async def async_client(test_client: TestClient) -> AsyncGenerator[AsyncClient, None]:
-    """Fixture that provides an AsyncClient for testing FastAPI endpoints."""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url=test_client.base_url) as async_client:
-        yield async_client
 
 
 @pytest.hookimpl(optionalhook=True)
