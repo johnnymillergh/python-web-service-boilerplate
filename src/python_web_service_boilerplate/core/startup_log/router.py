@@ -18,8 +18,6 @@ async def stream_startup_logs(
     startup_log_service: Annotated[StartupLogService, Depends(alchemy.provide_service(StartupLogService))],
 ) -> StreamingResponse:
     logger.info(f"{get_current_request().state.username} is accessing startup log stream")
-    count = await startup_log_service.count()
-    logger.info(f"There are {count} startup logs in the database")
     return StreamingResponse(startup_log_service.log_streamer(), media_type="text/event-stream")
 
 
