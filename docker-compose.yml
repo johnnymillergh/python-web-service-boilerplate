@@ -40,11 +40,6 @@ services:
       retries: 5
       start_period: 10s
     environment:
-      - OFFLINE_ENV=false
-      - LOG_LEVEL=INFO
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=boilerplate_db
-      - SQL_LOG_ENABLED=false
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_SQL_LOG_ENABLED=false
