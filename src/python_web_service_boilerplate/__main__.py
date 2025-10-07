@@ -11,6 +11,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from loguru import logger
+from starlette.responses import HTMLResponse
 
 from python_web_service_boilerplate.common.common_function import get_module_name
 from python_web_service_boilerplate.common.middleware import TraceIDMiddleware
@@ -105,7 +106,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         await shutdown()
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
 # Add trace ID middleware to automatically handle request tracing
 app.add_middleware(AuthMiddleware)
 app.add_middleware(TraceIDMiddleware)
@@ -120,6 +121,30 @@ async def root() -> dict[str, str]:
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "UP"}
+
+
+@app.get("/docs", include_in_schema=False)
+async def api_documentation() -> HTMLResponse:
+    return HTMLResponse("""
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Elements in HTML</title>
+
+    <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
+  </head>
+  <body>
+
+    <elements-api
+      apiDescriptionUrl="openapi.json"
+      router="hash"
+    />
+
+  </body>
+</html>""")
 
 
 if __name__ == "__main__":
