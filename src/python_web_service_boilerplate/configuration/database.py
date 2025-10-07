@@ -17,20 +17,20 @@ from sqlmodel import Session, SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from python_web_service_boilerplate.common.common_function import get_data_dir, get_module_name, offline_environment
-from python_web_service_boilerplate.configuration.application import application_conf
+from python_web_service_boilerplate.configuration.application import settings
 
 DATABASE_URL = (
     (
-        f"postgresql+psycopg://{application_conf.get_string('database.username')}:{application_conf.get_string('database.password')}"
-        f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
+        f"postgresql+psycopg://{settings.database.username}:{settings.database.password}"
+        f"@{settings.database.host}:{settings.database.port}/{settings.database.db_name}"
     )
     if not offline_environment()
     else f"sqlite:///{get_data_dir()}/{get_module_name()}.db"
 )
 ASYNC_DATABASE_URL = (
     (
-        f"postgresql+asyncpg://{application_conf.get_string('database.username')}:{application_conf.get_string('database.password')}"
-        f"@{application_conf.get_string('database.host')}:{application_conf.get_string('database.port')}/{application_conf.get_string('database.db_name')}"
+        f"postgresql+asyncpg://{settings.database.username}:{settings.database.password}"
+        f"@{settings.database.host}:{settings.database.port}/{settings.database.db_name}"
     )
     if not offline_environment()
     else f"sqlite+aiosqlite:///{get_data_dir()}/{get_module_name()}.db"
@@ -53,7 +53,7 @@ sync_engine: Engine = create_engine(
     pool_use_lifo=True,
     pool_pre_ping=True,
     pool_recycle=3600,
-    echo=application_conf.get_bool("database.sql_log_enabled"),
+    echo=settings.database.sql_log_enabled,
 )
 
 _SessionLocal = sessionmaker(
@@ -68,7 +68,7 @@ __async_engine = create_async_engine(
     pool_use_lifo=True,
     pool_pre_ping=True,
     pool_recycle=3600,
-    echo=application_conf.get_bool("database.sql_log_enabled"),
+    echo=settings.database.sql_log_enabled,
 )
 
 _AsyncSessionLocal = async_sessionmaker(

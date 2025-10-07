@@ -102,8 +102,8 @@ def offline_environment() -> bool:
     if offline_env:
         logger.warning("Detected offline environment")
         bool(1)
-    offline = os.getenv("OFFLINE_ENV")
+    offline = os.getenv("OFFLINE")
     if offline == "true":
-        logger.warning(f"Detected offline environment due to `OFFLINE_ENV` variable set: {offline}")
+        logger.warning(f"Detected offline environment due to `OFFLINE` variable set: {offline}")
         offline_env = True
     return offline_env
