@@ -51,8 +51,8 @@ jobs:
       - uses: ./.github/actions/project-environment-setup
       - name: Start FastAPI app
         run: |
-          env OFFLINE_ENV=true poetry run alembic upgrade head && \
-          env OFFLINE_ENV=true LOG_LEVEL=INFO poetry run fastapi run src/python_web_service_boilerplate/__main__.py --port 8000 &
+          env OFFLINE=true poetry run alembic upgrade head && \
+          env OFFLINE=true LOG_LEVEL=INFO poetry run fastapi run src/python_web_service_boilerplate/__main__.py --port 8000 &
           FASTAPI_PID=$!
           echo $FASTAPI_PID > fastapi.pid
           # Wait for FastAPI to be ready (max 30 seconds)

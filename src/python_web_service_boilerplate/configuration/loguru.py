@@ -12,7 +12,7 @@ from loguru import logger
 
 from python_web_service_boilerplate.common.common_function import get_data_dir, get_module_name
 from python_web_service_boilerplate.common.trace import get_trace_id
-from python_web_service_boilerplate.configuration.application import application_conf
+from python_web_service_boilerplate.configuration.application import settings
 
 if TYPE_CHECKING:
     from loguru import Record
@@ -39,7 +39,7 @@ logger.remove(handler_id=None)
 # Set up logging for log file
 _logs_directory_path = get_data_dir("logs")
 _log_file = str(_logs_directory_path) + f"/{get_module_name()}.{platform.node()}." + "{time}.log"
-log_level = application_conf.get_string("log_level")
+log_level = settings.log_level
 logger.add(
     _log_file,
     level=log_level,
@@ -94,7 +94,7 @@ logging.basicConfig(handlers=intercept_handlers, level=0, force=True)
 
 # Redirect all existing loggers to loguru
 # Get all existing loggers from the logging module's logger dictionary
-existing_loggers = set(logging.Logger.manager.loggerDict.keys()) | set(application_conf.get_list("intercepted_loggers"))
+existing_loggers = set(logging.Logger.manager.loggerDict.keys()) | set(settings.intercepted_loggers)
 logger.info(f"Found {len(existing_loggers)} existing loggers: {existing_loggers}")
 for name in existing_loggers:
     current_logger = logging.getLogger(name)
@@ -107,7 +107,7 @@ logging.getLogger().propagate = False
 
 logger.info(f"{type(logger)} is intercepting standard logging")
 
-for key, value in application_conf.get_config("log").items():
+for key, value in settings.logger.items():
     logging.getLogger(key).setLevel(value)
     logger.info(f"Configured logger[{key}]'s level to {value}")
 
