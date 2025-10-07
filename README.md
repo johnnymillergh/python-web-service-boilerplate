@@ -35,16 +35,10 @@ Here are the highlights of **python_web_service_boilerplate**:
 * SQLite support via aiosqlite
 * JSON serialization with orjson for performance
 
-### Data Processing & Analysis
-
-* Pandas - Data manipulation and analysis
-* NumPy - Numerical computing
-* Matplotlib - Data visualization
-
 ### Configuration & Utilities
 
 - Pydantic - Data validation using Python type hints
-- Pyhocon - Configuration management with environment variable support
+- Pydantic Settings - Configuration management with environment variable support
 - Loguru - Advanced logging
 - Arrow - Better date/time handling
 - Tenacity - Retry functionality

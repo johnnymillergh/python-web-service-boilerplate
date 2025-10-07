@@ -1,8 +1,12 @@
 name: Publish docker image
-
+permissions:
+  packages: write
 on:
   push:
     tags: ["*"]
+    branches:
+      - 'main'
+      - 'develop'
 
 jobs:
   docker:
@@ -13,8 +17,8 @@ jobs:
     - name: Publish to GitHub Packages
       uses: whoan/docker-build-with-cache-action@v8
       with:
-        registry: docker.pkg.github.com
+        registry: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: "${{ secrets.GITHUB_TOKEN }}"
         image_name: ${{ github.repository }}
         push_git_tag: true
