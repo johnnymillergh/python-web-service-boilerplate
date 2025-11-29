@@ -1,64 +1,41 @@
-# syntax=docker/dockerfile:1
-# Keep this syntax directive! It's used to enable Docker BuildKit
-
-# Based on https://github.com/python-poetry/poetry/discussions/1879?sort=top#discussioncomment-216865
-# Inpired by https://gist.github.com/usr-ein/c42d98abca3cb4632ab0c2c6aff8c88a
-# but I try to keep it updated (see history)
+# Multi-stage build using uv for blazingly fast installs
 
 ################################
-# PYTHON-BASE
-# Sets up all our shared environment variables
+# UV BUILDER
+# Install dependencies using uv
 ################################
-FROM python:3.13.7-slim AS python-base
+FROM ghcr.io/astral-sh/uv:0.9.13 AS uv
+WORKDIR /app
 
-# Setup env for Python
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=off \
-    PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_VERSION=2.1.4 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_NO_INTERACTION=1 \
-    PYSETUP_PATH="/opt/pysetup" \
-    VENV_PATH="/opt/pysetup/.venv"
+# Copy pyproject and lock file
+COPY pyproject.toml uv.lock* ./
 
-# prepend poetry and venv to path
-ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
-
-################################
-# BUILDER-BASE
-# Used to build deps + create our virtual environment
-################################
-FROM python-base AS builder-base
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    curl \
-    build-essential
-
-# install poetry - respects $POETRY_VERSION & $POETRY_HOME
-# The --mount will mount the buildx cache directory to where
-# Poetry and Pip store their cache so that they can re-use it
-RUN --mount=type=cache,target=/root/.cache \
-    curl -sSL https://install.python-poetry.org | python3 -
-
-RUN poetry --version
-
-# copy project requirement files here to ensure they will be cached.
-WORKDIR $PYSETUP_PATH
-COPY poetry.lock pyproject.toml ./
-
-# install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
-RUN --mount=type=cache,target=/root/.cache \
-    poetry install --only=main --no-interaction --no-root
+# Install dependencies only (no dev dependencies for production)
+# --frozen: Don't update lock file
+# --no-dev: Exclude development dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
 
 ################################
 # PRODUCTION
-# Final image used for runtime
+# Final image with Python runtime
 ################################
-FROM python-base AS production
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    curl
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+FROM python:3.13.7-slim AS production
+
+# Copy virtualenv from uv image
+COPY --from=uv /app/.venv /app/.venv
+
+# Copy application
 COPY . /app/
 WORKDIR /app
+
+# Use virtualenv
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/health || exit 1
+
+# Run the application
+CMD ["python", "-m", "python_web_service_boilerplate"]

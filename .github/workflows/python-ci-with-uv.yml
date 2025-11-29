@@ -1,4 +1,4 @@
-name: Python CI with Poetry
+name: Python CI with uv
 
 on:
   pull_request:
@@ -21,7 +21,6 @@ on:
   # │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
   # │ │ │ │ │
   # │ │ │ │ │
-  # │ │ │ │ │
   # * * * * *
   schedule:
     # Schedule at 00:00 on Tuesday, Thursday, and Saturday, https://crontab.guru/#0_0_%2A_%2A_2%2C4%2C6
@@ -33,17 +32,17 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/project-environment-setup
-      - run: poetry run ruff check .
+      - run: uv run ruff check .
       - name: Install mypy types
         run: |
-          yes | poetry run mypy --install-types \
+          yes | uv run mypy --install-types \
           || test $? -eq 2 && echo "Installed mypy types successfully" \
           || echo "Failed to install mypy types"
-      - run: poetry run mypy
+      - run: uv run mypy
       - name: Python Tests with pytest
-        run: env LOG_LEVEL=INFO poetry run pytest --quiet --cov --cov-report term -n auto --benchmark-disable --dist=loadfile
+        run: env LOG_LEVEL=INFO uv run pytest --quiet --cov --cov-report term -n auto --benchmark-disable --dist=loadfile
       - name: Python Benchmark with pytest
-        run: env LOG_LEVEL=ERROR poetry run pytest --capture=no --log-cli-level=ERROR -n 0 --benchmark-only
+        run: env LOG_LEVEL=ERROR uv run pytest --capture=no --log-cli-level=ERROR -n 0 --benchmark-only
   fastapi-smoke-testing:
     runs-on: ubuntu-latest
     steps:
@@ -51,8 +50,8 @@ jobs:
       - uses: ./.github/actions/project-environment-setup
       - name: Start FastAPI app
         run: |
-          env OFFLINE=true poetry run alembic upgrade head && \
-          env OFFLINE=true LOG_LEVEL=INFO poetry run fastapi run src/python_web_service_boilerplate/__main__.py --port 8000 &
+          env OFFLINE=true uv run alembic upgrade head && \
+          env OFFLINE=true LOG_LEVEL=INFO uv run fastapi run src/python_web_service_boilerplate/__main__.py --port 8000 &
           FASTAPI_PID=$!
           echo $FASTAPI_PID > fastapi.pid
           # Wait for FastAPI to be ready (max 30 seconds)
@@ -71,12 +70,12 @@ jobs:
           USERNAME="stephon.treutelae_$(date +%Y%m%d%H%M%S)"
           curl -i -f -L -X POST 'http://localhost:8000/api/v1/users' \
             -H 'Content-Type: application/json' \
-            --data-raw "{
-              \"username\": \"$USERNAME\",
-              \"password\": \"123456\",
-              \"email\": \"Bethel43@hotmail.com\",
-              \"full_name\": \"Stephon Treutel\"
-            }" -o response.txt
+            --data-raw '{
+              "username": "'"$USERNAME"'",
+              "password": "123456",
+              "email": "Bethel43@hotmail.com",
+              "full_name": "Stephon Treutel"
+            }' -o response.txt
       - name: Show response
         run: cat response.txt
       - name: Kill FastAPI
@@ -90,7 +89,7 @@ jobs:
       - uses: ./.github/actions/project-environment-setup
       - name: Check Versions of Python Packages
         run: |
-          output=$(poetry run pip list --outdated)
+          output=$(uv pip list --outdated)
           if [ -z "$output" ]
           then
               echo "🎉 Congrats! Everything is up-to-date"
