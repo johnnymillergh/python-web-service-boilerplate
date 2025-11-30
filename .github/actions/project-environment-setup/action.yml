@@ -13,3 +13,6 @@ runs:
     - name: Set up Python
       shell: bash
       run: uv python install
+    - name: Install Dependencies with uv
+      shell: bash
+      run: uv sync --all-extras
