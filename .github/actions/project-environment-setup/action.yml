@@ -3,30 +3,12 @@ description: Setup project environment with uv
 runs:
   using: "composite"
   steps:
+    # https://docs.astral.sh/uv/guides/integration/github/
     - name: Install uv
-      shell: bash
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-    # The actions/cache step below uses this id to get the exact python version
-    - id: setup-python
-      uses: actions/setup-python@v5
+      uses: astral-sh/setup-uv@v7
       with:
-        python-version: "3.13.7"
-        architecture: x64
-        # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
-        cache: "uv"
-    - name: Install Python with uv
-      shell: bash
-      run: |
-        uv python install 3.13 && uv python pin 3.13
-    # https://github.com/actions/cache/blob/main/examples.md#python---pipenv
-    - id: cache-uv
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/uv
-        key: ${{ runner.os }}-python-${{ steps.setup-python.outputs.python-version }}-uv-${{ hashFiles('uv.lock') }}
-    - name: Install Dependencies with uv
-      if: steps.cache-uv.outputs.cache-hit != 'true'
-      shell: bash
-      run: uv sync --all-extras
+        # Install a specific version of uv.
+        version: "0.9.13"
+        enable-cache: true
+    - name: Set up Python
+      run: uv python install
