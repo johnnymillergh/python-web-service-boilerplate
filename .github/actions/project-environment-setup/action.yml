@@ -11,4 +11,5 @@ runs:
         version: "0.9.13"
         enable-cache: true
     - name: Set up Python
+      shell: bash
       run: uv python install
