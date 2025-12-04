@@ -46,10 +46,6 @@ def test_chunk_into_n() -> None:
     logger.info(f"Chunks: {chunks}")
 
 
-def test_get_cpu_count_benchmark(benchmark: BenchmarkFixture) -> None:
-    benchmark(get_cpu_count)
-
-
 def test_get_login_user_benchmark(benchmark: BenchmarkFixture) -> None:
     benchmark(get_login_user)
 
