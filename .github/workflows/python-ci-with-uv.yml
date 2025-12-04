@@ -42,7 +42,7 @@ jobs:
       - name: Python Tests with pytest
         run: env LOG_LEVEL=INFO uv run pytest --quiet --cov --cov-report term -n auto --benchmark-disable --dist=loadfile
       - name: Python Benchmark with pytest
-        run: env LOG_LEVEL=ERROR poetry run pyinstrument -m pytest --capture=no --log-cli-level=ERROR -n 0 --benchmark-only
+        run: env LOG_LEVEL=ERROR uv run pyinstrument -m pytest --capture=no --log-cli-level=ERROR -n 0 --benchmark-only
   fastapi-smoke-testing:
     runs-on: ubuntu-latest
     steps:
