@@ -92,7 +92,7 @@ jobs:
       - name: Run Docker container
         run: |
           # Run container in detached mode
-          docker run -d --name test-app -p 8080:80 -e OFFLINE=true python-web-service-boilerplate:latest
+          docker run -d --name test-app -p 8000:8000 -e OFFLINE=true python-web-service-boilerplate:latest
           # Wait for FastAPI to be ready (max 30 seconds)
           echo "Waiting for FastAPI to start..."
           for i in {1..60}; do
