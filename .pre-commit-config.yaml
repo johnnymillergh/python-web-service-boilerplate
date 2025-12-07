@@ -75,8 +75,6 @@ repos:
         name: Pytest with Coverage
         stages: [ pre-push ]
         language: system
-        # https://github.com/pytest-dev/pytest/issues/5502#issuecomment-1020761655
-        # Prevent Pytest logging error like: ValueError: I/O operation on closed file.
         entry: env LOG_LEVEL=ERROR uv run pytest --cov --cov-fail-under=80 --capture=no --log-cli-level=ERROR -n auto --dist=loadfile
         types: [ python ]
         pass_filenames: false

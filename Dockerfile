@@ -1,29 +1,32 @@
 # Multi-stage build using uv for blazingly fast installs
-
+FROM python:3.13.7-slim AS base
+FROM base AS builder
 ################################
 # UV BUILDER
 # Install dependencies using uv
 ################################
-FROM ghcr.io/astral-sh/uv:0.9.13 AS uv
+COPY --from=ghcr.io/astral-sh/uv:0.9.13 /uv /bin/uv
 WORKDIR /app
 
 # Copy pyproject and lock file
-COPY pyproject.toml uv.lock* ./
+COPY pyproject.toml uv.lock ./
 
 # Install dependencies only (no dev dependencies for production)
 # --frozen: Don't update lock file
 # --no-dev: Exclude development dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+    uv sync --no-extra
 
 ################################
 # PRODUCTION
 # Final image with Python runtime
 ################################
-FROM python:3.13.7-slim AS production
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    curl
 
 # Copy virtualenv from uv image
-COPY --from=uv /app/.venv /app/.venv
+COPY --from=builder /app/.venv /app/.venv
 
 # Copy application
 COPY . /app/
