@@ -264,7 +264,7 @@ The application supports both PostgreSQL and SQLite:
 
 ## CI/CD
 
-**GitHub Actions** (`.github/workflows/python-ci-with-poetry.yml`):
+**GitHub Actions** (`.github/workflows/python-ci-with-uv.yml`):
 - Python 3.13 testing
 - Pre-commit hook validation
 - Docker image publishing
