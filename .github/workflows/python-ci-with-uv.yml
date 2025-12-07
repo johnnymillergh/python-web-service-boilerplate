@@ -80,6 +80,48 @@ jobs:
         run: |
           FASTAPI_PID=$(cat fastapi.pid)
           kill $FASTAPI_PID
+  docker-smoke-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Docker image
+        run: |
+          docker build -t python-web-service-boilerplate:latest .
+      - name: Run Docker container
+        run: |
+          # Run container in detached mode
+          docker run -d --name test-app -p 8080:80 python-web-service-boilerplate:latest
+          # Wait for container to be ready
+          echo "Waiting for container to start..."
+          for i in {1..30}; do
+            if docker exec test-app curl -f http://localhost/health > /dev/null 2>&1; then
+              echo "Container is ready after $i seconds"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Container failed to start within 30 seconds"
+              docker logs test-app
+              docker exec test-app ps aux
+              exit 1
+            fi
+            sleep 1
+          done
+      - name: Test health endpoint
+        run: |
+          # Test the health endpoint
+          docker exec test-app curl -f http://localhost/health
+      - name: Show container logs
+        if: failure()
+        run: |
+          echo "=== Container logs ==="
+          docker logs test-app
+      - name: Clean up
+        run: |
+          # Stop and remove container
+          docker stop test-app || true
+          docker rm test-app || true
   check-versions:
     runs-on: ubuntu-latest
     steps:
