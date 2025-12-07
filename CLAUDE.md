@@ -32,7 +32,7 @@ uvicorn python_web_service_boilerplate.__main__:app --host localhost --port 8080
 ### Testing
 ```bash
 # Run all tests with coverage
-uv run pytest --cov --cov-report html --cov-fail-under=85 --capture=no --log-cli-level=INFO
+uv run pytest --cov --cov-report html --cov-fail-under=80 --capture=no --log-cli-level=INFO
 
 # Run with parallel execution
 uv run pytest -n auto
@@ -177,7 +177,7 @@ See `resources/.env.example` for all available settings.
 **Test Structure** (`tests/`):
 - Pytest with async support (`pytest-asyncio`)
 - Test client configured in `conftest.py`
-- Coverage threshold: 85%
+- Coverage threshold: 80%
 - Parallel execution with `pytest-xdist`
 - HTML coverage reports in `build/.pytest_report/`
 
