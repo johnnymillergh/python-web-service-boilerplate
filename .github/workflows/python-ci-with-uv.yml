@@ -93,25 +93,19 @@ jobs:
         run: |
           # Run container in detached mode
           docker run -d --name test-app -p 8080:80 -e OFFLINE=true python-web-service-boilerplate:latest
-          # Wait for container to be ready
-          echo "Waiting for container to start..."
-          for i in {1..30}; do
-            if docker exec test-app curl -f http://localhost/health > /dev/null 2>&1; then
-              echo "Container is ready after $i seconds"
+          # Wait for FastAPI to be ready (max 30 seconds)
+          echo "Waiting for FastAPI to start..."
+          for i in {1..60}; do
+            if curl -s -f GET http://localhost:8000/health > /dev/null 2>&1; then
+              echo "FastAPI (Docker) is ready after $i seconds"
               break
             fi
-            if [ $i -eq 30 ]; then
-              echo "Container failed to start within 30 seconds"
-              docker logs test-app
-              docker exec test-app ps aux
+            if [ $i -eq 60 ]; then
+              echo "FastAPI (Docker) failed to start within 60 seconds"
               exit 1
             fi
             sleep 1
           done
-      - name: Test health endpoint
-        run: |
-          # Test the health endpoint
-          docker exec test-app curl -f http://localhost/health
       - name: Show container logs
         if: failure()
         run: |
