@@ -89,6 +89,8 @@ Here are the highlights of **python_web_service_boilerplate**:
 
    # For Windows PowerShell
    $ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+   # Or use winget
+   $ winget install --id=astral-sh.uv
    ```
 
 2. Install dependencies, with optional dependency group `test`
