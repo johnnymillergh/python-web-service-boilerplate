@@ -92,7 +92,7 @@ jobs:
       - name: Run Docker container
         run: |
           # Run container in detached mode
-          docker run -d --name test-app -p 8080:80 python-web-service-boilerplate:latest
+          docker run -d --name test-app -p 8080:80 -e OFFLINE=true python-web-service-boilerplate:latest
           # Wait for container to be ready
           echo "Waiting for container to start..."
           for i in {1..30}; do
