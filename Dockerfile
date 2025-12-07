@@ -1,43 +1,35 @@
-# Multi-stage build using uv for blazingly fast installs
+# https://docs.roxautomation.com/linux/docker_best_practices/#multi-stage-build-patterns-with-uv
 
-################################
-# UV BUILDER
-# Install dependencies using uv
-################################
-FROM ghcr.io/astral-sh/uv:0.9.13 AS builder
+FROM python:3.13.7-slim AS base
+
+# Build stage
+FROM base AS builder
+COPY --from=ghcr.io/astral-sh/uv:0.9.13 /uv /bin/uv
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never
+
 WORKDIR /app
 
-# Copy pyproject and lock file
-COPY pyproject.toml uv.lock ./
-
-# Install dependencies only (no dev dependencies for production)
-# --no-extra: Exclude development dependencies
+# Install dependencies first (optimal caching)
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --no-extra
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
 
-################################
-# PRODUCTION
-# Final image with Python runtime
-################################
-FROM python:3.13.7-slim
+# Copy and install application
+COPY . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    curl
-
-# Copy virtualenv from uv image
-COPY --from=builder /app/.venv /app/.venv
-
-# Copy application
-COPY . /app/
+# Runtime stage
+FROM base
+RUN groupadd -r app && useradd -r -d /app -g app app
+COPY --from=builder --chown=app:app /app /app
+ENV PATH="/app/.venv/bin:$PATH"
+USER app
 WORKDIR /app
-
-# Use virtualenv
-ENV VIRTUAL_ENV=/app/.venv
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost/health || exit 1
-
-# Run the application
-CMD ["python", "-m", "python_web_service_boilerplate"]
+EXPOSE 8000
+CMD ["alembic", "upgrade", "head", "&&",
+ "uvicorn", "python_web_service_boilerplate.__main__:app", "--host", "0.0.0.0", "--port", "8000"]
