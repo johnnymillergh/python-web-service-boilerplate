@@ -156,4 +156,6 @@ dmypy.json
 # pyinstrument
 .profiles/
 
+.claude/
+
 # End of https://www.gitignore.io/api/python

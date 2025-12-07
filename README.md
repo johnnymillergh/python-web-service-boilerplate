@@ -25,7 +25,7 @@ Here are the highlights of **python_web_service_boilerplate**:
 * Uvicorn - ASGI server for FastAPI
 
 - Python 3.13 [![Python](https://img.shields.io/badge/Python-v3.13.7-blue)](https://www.python.org/downloads/release/python-3131/) - Latest Python version support
-- Poetry - Dependency management and packaging
+- uv - Fast Python package installer and dependency management
 
 ### Database & ORM
 
@@ -84,31 +84,32 @@ Here are the highlights of **python_web_service_boilerplate**:
 1. Setup the development environment
 
    ```shell
-   # Install pipx if not installed
-   $ python3 -m pip install pipx
-   $ python3 -m pipx ensurepath
+   # Install uv
+   $ curl -LsSf https://astral.sh/uv/install.sh | sh
 
-   # Install poetry using pipx, https://python-poetry.org/docs/#installing-with-pipx
-   $ pipx install poetry
+   # For Windows PowerShell
+   $ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+   # Or use winget
+   $ winget install --id=astral-sh.uv
    ```
 
 2. Install dependencies, with optional dependency group `test`
 
    ```shell
-   $ poetry install --with test
+   $ uv sync --extra test --extra dev
    ```
 
 3. Install mypy types
 
    ```shell
-   $ poetry run mypy --install-types
+   $ uv run mypy --install-types
    ```
 
 4. Setup pre-commit and pre-push hooks
 
    ```shell
-   $ poetry run pre-commit install -t pre-commit
-   $ poetry run pre-commit install -t pre-push
+   $ uv run pre-commit install -t pre-commit
+   $ uv run pre-commit install -t pre-push
    ```
 
 5. Start up the application
@@ -122,7 +123,6 @@ Here are the highlights of **python_web_service_boilerplate**:
 ### Run Python Module
 
 ```shell
-$ poetry env activate
 $ python3 -m python_web_service_boilerplate
 $ uvicorn python_web_service_boilerplate.__main__:app --host localhost --port 8080 --reload
 ```
@@ -137,11 +137,11 @@ For macOS or Linux,
 
 ```shell
 # Ensure `pwd` is the root directory of the project
-$ PYTHONPATH=`pwd` poetry run python3 python_web_service_boilerplate/demo/pandas_usage.py
-$ PYTHONPATH=`pwd` poetry run python3 python_web_service_boilerplate/demo/multithread_and_thread_pool_usage.py
+$ PYTHONPATH=`pwd` uv run python3 python_web_service_boilerplate/demo/pandas_usage.py
+$ PYTHONPATH=`pwd` uv run python3 python_web_service_boilerplate/demo/multithread_and_thread_pool_usage.py
 
 # Run the main module
-$ PYTHONPATH=`pwd` poetry run python3 python_web_service_boilerplate/__main__.py
+$ PYTHONPATH=`pwd` uv run python3 python_web_service_boilerplate/__main__.py
 
 # Run a pytest script
 $ pytest --log-cli-level=DEBUG --capture=no tests/common/test_debounce_throttle.py
@@ -150,17 +150,17 @@ $ pytest --log-cli-level=DEBUG --capture=no tests/common/test_debounce_throttle.
 $ pytest --log-cli-level=DEBUG --capture=no tests/common/test_debounce_throttle.py -k 'test_debounce'
 
 # For more details of pytest command
-$ poetry run pytest --help
+$ uv run pytest --help
 ```
 
 For Windows Terminal,
 ```powershell
 # Ensure `$PWD.Path` is the root directory of the project
-$ $env:PYTHONPATH=$PWD.Path; poetry run python .\python_web_service_boilerplate\demo\pandas_usage.py
-$ $env:PYTHONPATH=$PWD.Path; poetry run python .\python_web_service_boilerplate\demo\multithread_and_thread_pool_usage.py
+$ $env:PYTHONPATH=$PWD.Path; uv run python .\python_web_service_boilerplate\demo\pandas_usage.py
+$ $env:PYTHONPATH=$PWD.Path; uv run python .\python_web_service_boilerplate\demo\multithread_and_thread_pool_usage.py
 
 # Run the main module
-$ $env:PYTHONPATH=$PWD.Path; poetry run python .\python_web_service_boilerplate\__main__.py
+$ $env:PYTHONPATH=$PWD.Path; uv run python .\python_web_service_boilerplate\__main__.py
 ```
 
 ### Run Unit Tests
@@ -168,13 +168,13 @@ $ $env:PYTHONPATH=$PWD.Path; poetry run python .\python_web_service_boilerplate\
 Run with pytest, analyze code coverage, generate HTML code coverage reports, fail the test if coverage percentage is under 90%,
 
 ```shell
-$ poetry run pytest --cov --cov-report html --cov-fail-under=85 --capture=no --log-cli-level=INFO
+$ uv run pytest --cov --cov-report html --cov-fail-under=85 --capture=no --log-cli-level=INFO
 ```
 
 Benchmark with pytest,
 
 ```shell
-$ poetry run pytest --capture=no --log-cli-level=ERROR -n 0 --benchmark-only
+$ uv run pytest --capture=no --log-cli-level=ERROR -n 0 --benchmark-only
 ```
 
 ### Conventional Changelog CLI
@@ -200,7 +200,7 @@ $ poetry run pytest --capture=no --log-cli-level=ERROR -n 0 --benchmark-only
 ### Check Versions of Python Packages
 
 ```shell
-$ poetry run pip list --outdated
+$ uv pip list --outdated
 ```
 
 Output be like,

@@ -73,4 +73,4 @@ settings: Final[Settings] = Settings()
 
 def configure() -> None:
     """Configure application."""
-    logger.warning(f"Application configuration loaded, {settings}, {pyproject_toml['tool']['poetry']['name']}")
+    logger.warning(f"Application configuration loaded, {settings}, {pyproject_toml['project']['name']}")

@@ -1,64 +1,34 @@
-# syntax=docker/dockerfile:1
-# Keep this syntax directive! It's used to enable Docker BuildKit
+# https://docs.roxautomation.com/linux/docker_best_practices/#multi-stage-build-patterns-with-uv
 
-# Based on https://github.com/python-poetry/poetry/discussions/1879?sort=top#discussioncomment-216865
-# Inpired by https://gist.github.com/usr-ein/c42d98abca3cb4632ab0c2c6aff8c88a
-# but I try to keep it updated (see history)
+FROM python:3.13.7-slim AS base
 
-################################
-# PYTHON-BASE
-# Sets up all our shared environment variables
-################################
-FROM python:3.13.7-slim AS python-base
+# Build stage
+FROM base AS builder
+COPY --from=ghcr.io/astral-sh/uv:0.9.13 /uv /bin/uv
 
-# Setup env for Python
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=off \
-    PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_VERSION=2.1.4 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_NO_INTERACTION=1 \
-    PYSETUP_PATH="/opt/pysetup" \
-    VENV_PATH="/opt/pysetup/.venv"
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never
 
-# prepend poetry and venv to path
-ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
-
-################################
-# BUILDER-BASE
-# Used to build deps + create our virtual environment
-################################
-FROM python-base AS builder-base
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    curl \
-    build-essential
-
-# install poetry - respects $POETRY_VERSION & $POETRY_HOME
-# The --mount will mount the buildx cache directory to where
-# Poetry and Pip store their cache so that they can re-use it
-RUN --mount=type=cache,target=/root/.cache \
-    curl -sSL https://install.python-poetry.org | python3 -
-
-RUN poetry --version
-
-# copy project requirement files here to ensure they will be cached.
-WORKDIR $PYSETUP_PATH
-COPY poetry.lock pyproject.toml ./
-
-# install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
-RUN --mount=type=cache,target=/root/.cache \
-    poetry install --only=main --no-interaction --no-root
-
-################################
-# PRODUCTION
-# Final image used for runtime
-################################
-FROM python-base AS production
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    curl
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-COPY . /app/
 WORKDIR /app
+
+# Install dependencies first (optimal caching)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
+
+# Copy and install application
+COPY . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+
+# Runtime stage
+FROM base
+RUN groupadd -r app && useradd -r -d /app -g app app
+COPY --from=builder --chown=app:app /app /app
+ENV PATH="/app/.venv/bin:$PATH"
+USER app
+WORKDIR /app
+EXPOSE 8000
+CMD ["fastapi", "run", "src/python_web_service_boilerplate/__main__.py", "--host", "0.0.0.0", "--port", "8000"]

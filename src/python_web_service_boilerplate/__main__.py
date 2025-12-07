@@ -76,9 +76,7 @@ async def startup(app: FastAPI) -> None:
     __startup_log = saved_startup_log
 
     elapsed = time.perf_counter() - __start_time
-    logger.info(
-        f"Started {get_module_name()}@{pyproject_toml['tool']['poetry']['version']} in {timedelta(seconds=elapsed)}"
-    )
+    logger.info(f"Started {get_module_name()}@{pyproject_toml['project']['version']} in {timedelta(seconds=elapsed)}")
 
 
 async def shutdown() -> None:
