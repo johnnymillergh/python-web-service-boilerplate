@@ -31,4 +31,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 USER app
 WORKDIR /app
 EXPOSE 8000
-CMD ["alembic", "upgrade", "head", "&&", "uvicorn", "python_web_service_boilerplate.__main__:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "src/python_web_service_boilerplate/__main__.py", "--host", "0.0.0.0", "--port", "8000"]
