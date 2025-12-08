@@ -17,7 +17,7 @@ from python_web_service_boilerplate.core.auth.repository import get_user_by_user
 from python_web_service_boilerplate.core.auth.schemas import AuthTokenResponse, JWTPayload, UserRegistration
 
 # Secret key for JWT
-_SECRET_KEY = f"SECRET_KEY::{get_module_name()}::{pyproject_toml['tool']['poetry']['description']}"
+_SECRET_KEY = f"SECRET_KEY::{get_module_name()}::{pyproject_toml['project']['description']}"
 _ALGORITHM = "HS256"
 
 
